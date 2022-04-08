@@ -1,16 +1,11 @@
 package ru.yarsu.molab;
 
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-
-import java.io.FileNotFoundException;
-import java.util.Random;
 
 public class HelloController {
     @FXML
@@ -24,8 +19,10 @@ public class HelloController {
     @FXML
     private GridPane objectiveFunction;
 
-    private Fraction[] objF = new Fraction[17];
-    private Fraction[][] constraints = new Fraction[17][17];
+    private final Fraction[] objF = new Fraction[17];
+    private final Fraction[][] constraints = new Fraction[17][17];
+
+    private Solver solver;
 
     private TextField generateCell(String text, boolean editable) {
         TextField tf = new TextField();
@@ -145,6 +142,15 @@ public class HelloController {
     }
 
     @FXML
+    private void handleKeyInput() {
+
+    }
+    @FXML
+    private void handleAboutAction() {
+
+    }
+
+    @FXML
     private void initialize() {
         //init tables
         for (int i = 0; i < 17; i++) {
@@ -171,49 +177,7 @@ public class HelloController {
                     createConstraintsTable(constraintsNSpinner.getValue(), varNSpinner.getValue());
                 }
         );
-
-
-
     }
 
-    @FXML
-    protected void onHelloButtonClick() throws FileNotFoundException {
-        System.out.println("dfd");
-        welcomeText.setText("Welcome to JavaFX Application!");
-        Solver solver = new Solver();
-        solver.readFromFile("input.txt");
-    }
 
-    private void resize(int row, int col) {
-//        for (int i=)
-//        if (editRows) {
-//            for (int x = 0; x < varNSpinner.getValue(); x++) {
-//                TextField tf = new TextField();
-//                tf.setPrefHeight(50);
-//                tf.setPrefWidth(50);
-//                tf.setAlignment(Pos.CENTER);
-//                tf.setEditable(true);
-//                tf.setText(constraintsNSpinner.getValue()-1 + Integer.toString(x));
-//                System.out.println(constraintsNSpinner.getValue()-1);
-//                GridPane.setRowIndex(tf, constraintsNSpinner.getValue()-1);
-//                table.setColumnIndex(tf, x);
-//                table.getChildren().add(tf);
-//            }
-//
-//        } else {
-//            System.out.println(varNSpinner.getValue());
-//            for (int y = 0; y < constraintsNSpinner.getValue(); y++) {
-//                TextField tf = new TextField();
-//                tf.setPrefHeight(50);
-//                tf.setPrefWidth(50);
-//                tf.setAlignment(Pos.CENTER);
-//                tf.setEditable(true);
-//                tf.setText(y + Integer.toString(varNSpinner.getValue()-1));
-//                table.setRowIndex(tf, y);
-//                table.setColumnIndex(tf, varNSpinner.getValue()-1);
-//                table.getChildren().add(tf);
-//            }
-//        }
-
-    }
 }

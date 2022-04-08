@@ -47,5 +47,19 @@ public class Solver {
         }
     }
 
+    public Fraction[] getObjF() {
+        return objF;
+    }
 
+    public void setObjF(Fraction[] objF) {
+        this.objF = objF;
+    }
+
+    public Fraction[][] getConstraints() {
+        return constraints;
+    }
+
+    public void setConstraints(Fraction[][] constraints) {
+        this.constraints = constraints;
+    }
 }
