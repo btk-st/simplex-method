@@ -14,6 +14,7 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Button?>
 <HBox alignment="CENTER" prefHeight="520.0" prefWidth="572.0" spacing="20.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.yarsu.molab.LabController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
@@ -53,6 +54,7 @@
     <VBox>
         <GridPane prefWidth="700"  fx:id="objectiveFunction"/>
         <GridPane prefWidth="700" fx:id="table"/>
+        <Button text="Применить" onAction="#apply"/>
     </VBox>
 
 </HBox>

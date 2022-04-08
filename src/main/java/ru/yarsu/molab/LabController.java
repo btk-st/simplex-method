@@ -152,7 +152,6 @@ public class LabController {
         solver.readFromFile(file);
         constraintsNSpinner.getValueFactory().setValue(solver.getConstraintsN());
         varNSpinner.getValueFactory().setValue(solver.getVarN());
-        solver.print();
     }
 
     @FXML
@@ -173,12 +172,20 @@ public class LabController {
     private void handleHelp() {
 
     }
-
+    @FXML
+    private void apply() {
+        saveObjFTable(varNSpinner.getValue());
+        saveConstraintsTable(constraintsNSpinner.getValue(), varNSpinner.getValue());
+        System.out.println("saved:");
+        solver.print();
+    }
     @FXML
     private void initialize() {
         //init tables
         solver = new Solver();
         solver.init();
+        solver.setVarN(varNSpinner.getValue());
+        solver.setConstraintsN(constraintsNSpinner.getValue());
         objF = solver.getObjF();
         constraints = solver.getConstraints();
 
@@ -188,18 +195,13 @@ public class LabController {
         //resize tables when values change
         varNSpinner.valueProperty().addListener((obs, oldValue, newValue) -> {
                     solver.setVarN(newValue);
-                    saveObjFTable(oldValue);
-                    saveConstraintsTable(constraintsNSpinner.getValue(), oldValue);
                     createObjFTable(varNSpinner.getValue());
                     createConstraintsTable(constraintsNSpinner.getValue(), varNSpinner.getValue());
-                    solver.print();
                 }
         );
         constraintsNSpinner.valueProperty().addListener((obs, oldValue, newValue) -> {
                     solver.setConstraintsN(newValue);
-                    saveConstraintsTable(oldValue, varNSpinner.getValue());
                     createConstraintsTable(constraintsNSpinner.getValue(), varNSpinner.getValue());
-                    solver.print();
                 }
         );
     }
