@@ -2,14 +2,18 @@ package ru.yarsu.molab;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.Label;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.stage.FileChooser;
+
+import java.io.File;
 
 public class LabController {
+
     @FXML
-    private Label welcomeText;
+    public MenuBar menuBar;
     @FXML
     private Spinner<Integer> varNSpinner;
     @FXML
@@ -19,8 +23,8 @@ public class LabController {
     @FXML
     private GridPane objectiveFunction;
 
-    private final Fraction[] objF = new Fraction[17];
-    private final Fraction[][] constraints = new Fraction[17][17];
+    private Fraction[] objF;
+    private Fraction[][] constraints;
 
     private Solver solver;
 
@@ -74,7 +78,7 @@ public class LabController {
                 objF[i - cols - 3] = new Fraction(value);
 
             } catch (Exception e) {
-                System.out.println("bad format");
+                System.out.println("bad format" + e);
             }
         }
         try {
@@ -103,7 +107,7 @@ public class LabController {
         table.getChildren().add(tf);
 
         for (int i = 1; i < constraintsN + 1; i++) {
-            tf = generateCell("f" + Integer.toString(i) + "(x)", false);
+            tf = generateCell("f" + i + "(x)", false);
             GridPane.setRowIndex(tf, i);
             GridPane.setColumnIndex(tf, 0);
             table.getChildren().add(tf);
@@ -142,39 +146,60 @@ public class LabController {
     }
 
     @FXML
-    private void handleKeyInput() {
+    private void handleFileOpen() {
+        FileChooser fileChooser = new FileChooser();
+        File file = fileChooser.showOpenDialog(table.getScene().getWindow());
+        solver.readFromFile(file);
+        constraintsNSpinner.getValueFactory().setValue(solver.getConstraintsN());
+        varNSpinner.getValueFactory().setValue(solver.getVarN());
+        solver.print();
+    }
+
+    @FXML
+    private void handleFileSave() {
 
     }
+
     @FXML
-    private void handleAboutAction() {
+    private void handleFileSaveAs() {
+
+    }
+
+    @FXML
+    private void handleAuthor() {
+    }
+
+    @FXML
+    private void handleHelp() {
 
     }
 
     @FXML
     private void initialize() {
         //init tables
-        for (int i = 0; i < 17; i++) {
-            objF[i] = new Fraction(0, 1);
-            for (int j = 0; j < 17; j++) {
-                constraints[i][j] = new Fraction(0, 1);
-            }
-        }
+        solver = new Solver();
+        solver.init();
+        objF = solver.getObjF();
+        constraints = solver.getConstraints();
 
         createObjFTable(varNSpinner.getValue());
         createConstraintsTable(constraintsNSpinner.getValue(), varNSpinner.getValue());
 
         //resize tables when values change
         varNSpinner.valueProperty().addListener((obs, oldValue, newValue) -> {
+                    solver.setVarN(newValue);
                     saveObjFTable(oldValue);
-                    createObjFTable(varNSpinner.getValue());
                     saveConstraintsTable(constraintsNSpinner.getValue(), oldValue);
+                    createObjFTable(varNSpinner.getValue());
                     createConstraintsTable(constraintsNSpinner.getValue(), varNSpinner.getValue());
+                    solver.print();
                 }
         );
-
         constraintsNSpinner.valueProperty().addListener((obs, oldValue, newValue) -> {
+                    solver.setConstraintsN(newValue);
                     saveConstraintsTable(oldValue, varNSpinner.getValue());
                     createConstraintsTable(constraintsNSpinner.getValue(), varNSpinner.getValue());
+                    solver.print();
                 }
         );
     }

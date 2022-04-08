@@ -18,24 +18,24 @@
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
-<!--    <MenuBar fx:id="menuBar" onKeyPressed="#handleKeyInput">-->
-<!--        <menus>-->
-<!--            <Menu text="Файл">-->
-<!--                <items>-->
-<!--                    <MenuItem text="Открыть"/>-->
-<!--                    <MenuItem text="Сохранить"/>-->
-<!--                    <MenuItem text="Сохранить как"/>-->
-<!--                </items>-->
-<!--            </Menu>-->
-<!--            <Menu text="О программе">-->
-<!--                <items>-->
-<!--                    <MenuItem text="Автор"/>-->
-<!--                    <SeparatorMenuItem />-->
-<!--                    <MenuItem text="Помощь" onAction="#handleAboutAction"/>-->
-<!--                </items>-->
-<!--            </Menu>-->
-<!--        </menus>-->
-<!--    </MenuBar>-->
+    <MenuBar  fx:id="menuBar" minWidth="200">
+        <menus>
+            <Menu text="Файл">
+                <items>
+                    <MenuItem text="Открыть" onAction="#handleFileOpen"/>
+                    <MenuItem text="Сохранить" onAction="#handleFileSave"/>
+                    <MenuItem text="Сохранить как" onAction="#handleFileSaveAs"/>
+                </items>
+            </Menu>
+            <Menu text="О программе">
+                <items>
+                    <MenuItem text="Автор" onAction="#handleAuthor"/>
+                    <SeparatorMenuItem />
+                    <MenuItem text="Помощь" onAction="#handleHelp"/>
+                </items>
+            </Menu>
+        </menus>
+    </MenuBar>
    <VBox alignment="TOP_LEFT" prefWidth="100">
        <Label text="число переменных" />
        <Spinner editable="true" fx:id="varNSpinner" >
