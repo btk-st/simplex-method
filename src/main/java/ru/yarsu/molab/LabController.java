@@ -7,7 +7,7 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
-public class HelloController {
+public class LabController {
     @FXML
     private Label welcomeText;
     @FXML
