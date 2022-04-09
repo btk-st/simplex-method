@@ -2,16 +2,17 @@ package ru.yarsu.molab;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class LabController {
 
@@ -27,10 +28,12 @@ public class LabController {
     private GridPane objectiveFunction;
     @FXML
     private Label fileNameLabel;
+    @FXML
+    private Button solve;
 
     private Fraction[] objF;
     private Fraction[][] constraints;
-
+    private ArrayList<Integer> basis = new ArrayList<Integer>();
     private File curFile = null;
     private Solver solver;
 
@@ -97,12 +100,27 @@ public class LabController {
 
     private void createConstraintsTable(int constraintsN, int varN) {
         table.getChildren().clear();
+        basis.clear();
         TextField tf = generateCell("", false);
         GridPane.setRowIndex(tf, 0);
         GridPane.setColumnIndex(tf, 0);
         table.getChildren().add(tf);
         for (int i = 1; i < varN + 1; i++) {
             tf = generateCell("a" + i, false);
+
+            //eventhandler to get chosen basis vars
+            int finalI = i;
+            tf.setOnMouseClicked(e -> {
+                TextField textField = (TextField) e.getSource();
+                if (!basis.contains(finalI-1)) {
+                    basis.add(finalI-1);
+                    textField.setStyle("-fx-border-color:red;");
+                }
+                else {
+                    basis.remove(Integer.valueOf(finalI-1));
+                    textField.setStyle("-fx-border-color:lightgrey;");
+                }
+            });
             GridPane.setRowIndex(tf, 0);
             GridPane.setColumnIndex(tf, i);
             table.getChildren().add(tf);
@@ -239,6 +257,37 @@ public class LabController {
                     createConstraintsTable(constraintsNSpinner.getValue(), varNSpinner.getValue());
                 }
         );
+    }
+
+    @FXML
+    private void solve() {
+        if (basis.size() != solver.getConstraintsN()) {
+            System.out.println("n of constraint should be equal to basis length");
+            return;
+        }
+        int[] arr = new int[solver.getVarN()];
+        for (int i = 0; i < solver.getVarN(); i++){
+            arr[i] = i;
+        }
+        int[] arr1 = new int[solver.getConstraintsN()];
+        for (int i = 0; i < solver.getConstraintsN(); i++){
+            arr1[i] = i;
+        }
+        StepMatrix matrix = new StepMatrix(solver.toMatrix(solver.getConstraintsN(), solver.getVarN()+1), arr, arr1);
+        matrix.print();
+        //move basis to the left of the matrix
+        Collections.sort(basis);
+        for (int i = 0; i < basis.size(); i ++) {
+            matrix.swapColumns(i, basis.get(i));
+        }
+
+        matrix.print();
+
+        //convert to diagonal view
+        System.out.println("diagonal:");
+        matrix.makeDiagonal();
+        matrix.print();
+
     }
 
 

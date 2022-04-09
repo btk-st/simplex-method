@@ -135,6 +135,17 @@ public class Solver {
         }
     }
 
+    public Matrix toMatrix(int rows, int cols) {
+        Fraction[][] res = new Fraction[rows][cols];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols - 1; j++) {
+                res[i][j] = new Fraction(constraints[i][j]);
+            }
+            res[i][cols-1] = new Fraction(constraints[i][MAX_SIZE-1]);
+        }
+        return new Matrix(res, rows, cols);
+    }
+
     public Fraction[] getObjF() {
         return objF;
     }

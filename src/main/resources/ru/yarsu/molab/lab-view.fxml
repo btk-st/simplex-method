@@ -65,6 +65,7 @@
               </valueFactory>
           </Spinner>
            <Button onAction="#apply" text="Применить" />
+         <Button fx:id="solve" mnemonicParsing="false" text="Привести к диагонльной" onAction="#solve"/>
          <opaqueInsets>
             <Insets />
          </opaqueInsets>

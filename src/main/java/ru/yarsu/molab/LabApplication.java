@@ -13,7 +13,7 @@ public class LabApplication extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(LabApplication.class.getResource("lab-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1000, 700);
 
-        stage.setTitle("Hello!");
+        stage.setTitle("Simplex method");
         stage.setScene(scene);
         stage.show();
     }

@@ -17,6 +17,10 @@ public class Fraction {
         denominator = denr;
         reduce();
     }
+    //cpu
+    public Fraction(Fraction that) {
+        this(that.getNumerator(), that.getDenominator());
+    }
 
     public Fraction(String fraction) throws Exception {
         String[] nums = fraction.split("/");
