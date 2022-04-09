@@ -2,13 +2,16 @@ package ru.yarsu.molab;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 
 public class LabController {
 
@@ -22,10 +25,13 @@ public class LabController {
     private GridPane table;
     @FXML
     private GridPane objectiveFunction;
+    @FXML
+    private Label fileNameLabel;
 
     private Fraction[] objF;
     private Fraction[][] constraints;
 
+    private File curFile = null;
     private Solver solver;
 
     private TextField generateCell(String text, boolean editable) {
@@ -146,9 +152,23 @@ public class LabController {
     }
 
     @FXML
+    private void handleNewFile() {
+        solver.init();
+        solver.setVarN(varNSpinner.getValue());
+        solver.setConstraintsN(constraintsNSpinner.getValue());
+        createObjFTable(solver.getVarN());
+        createConstraintsTable(solver.getConstraintsN(), solver.getVarN());
+        curFile = null;
+        fileNameLabel.setText("Файл не используется");
+    }
+
+    @FXML
     private void handleFileOpen() {
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(table.getScene().getWindow());
+        if (file == null) return;
+        curFile = file;
+        fileNameLabel.setText("Текущий файл: " + file.getAbsolutePath());
         solver.readFromFile(file);
         constraintsNSpinner.getValueFactory().setValue(solver.getConstraintsN());
         varNSpinner.getValueFactory().setValue(solver.getVarN());
@@ -156,12 +176,26 @@ public class LabController {
 
     @FXML
     private void handleFileSave() {
-
+        saveObjFTable(varNSpinner.getValue());
+        saveConstraintsTable(constraintsNSpinner.getValue(), varNSpinner.getValue());
+        if (curFile == null) {
+            System.out.println("no active file");
+            return;
+        }
+        solver.saveToFile(curFile);
     }
 
     @FXML
     private void handleFileSaveAs() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text doc(*.txt)", "*.txt"));
+        curFile = fileChooser.showSaveDialog(table.getScene().getWindow());
+        try {
+            curFile.createNewFile();
+         } catch (Exception er) {
 
+        }
+        handleFileSave();
     }
 
     @FXML
@@ -181,6 +215,7 @@ public class LabController {
     }
     @FXML
     private void initialize() {
+        fileNameLabel.setText("Файл не используется");
         //init tables
         solver = new Solver();
         solver.init();

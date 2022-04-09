@@ -2,6 +2,8 @@ package ru.yarsu.molab;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -80,6 +82,42 @@ public class Solver {
         }
     }
 
+    public void saveToFile(File curFile) {
+        FileWriter writer;
+        try {
+            writer = new FileWriter(curFile);
+            writer.write(Integer.toString(varN));
+            writer.write("\n");
+            writer.write(Integer.toString(constraintsN));
+            writer.write("\n");
+            //objF
+            StringBuilder s = new StringBuilder();
+            for (int i=0; i < varN; i++) {
+                s.append(objF[i].toString()).append(" ");
+            }
+            s.append(objF[MAX_SIZE - 1].toString());
+            writer.write(s.toString());
+            writer.write("\n");
+            // constraints
+
+            for (int i = 0; i < constraintsN; i++) {
+                s = new StringBuilder();
+                for (int j = 0; j < varN; j++) {
+                    s.append(constraints[i][j].toString()).append(" ");
+                }
+                s.append(constraints[i][MAX_SIZE - 1].toString());
+                writer.write(s.toString());
+                writer.write("\n");
+            }
+
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("error saving file");
+            return;
+        }
+
+    }
+
     public void print() {
         System.out.println("objf:");
         for (int i = 0; i < varN; i ++) {
@@ -128,4 +166,6 @@ public class Solver {
     public void setConstraintsN(int constraintsN) {
         this.constraintsN = constraintsN;
     }
+
+
 }

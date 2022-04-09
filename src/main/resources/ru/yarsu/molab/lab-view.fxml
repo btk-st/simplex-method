@@ -23,6 +23,7 @@
         <menus>
             <Menu text="Файл">
                 <items>
+                    <MenuItem text="Новый файл" onAction="#handleNewFile"/>
                     <MenuItem text="Открыть" onAction="#handleFileOpen"/>
                     <MenuItem text="Сохранить" onAction="#handleFileSave"/>
                     <MenuItem text="Сохранить как" onAction="#handleFileSaveAs"/>
@@ -44,6 +45,7 @@
                <SpinnerValueFactory.IntegerSpinnerValueFactory min="1" max="16"/>
            </valueFactory>
        </Spinner>
+
        <Label  text="число ограничений" />
        <Spinner fx:id="constraintsNSpinner" editable="true">
            <valueFactory>
@@ -56,5 +58,7 @@
         <GridPane prefWidth="700" fx:id="table"/>
         <Button text="Применить" onAction="#apply"/>
     </VBox>
+    <Label fx:id="fileNameLabel" prefWidth="300"/>
+
 
 </HBox>
