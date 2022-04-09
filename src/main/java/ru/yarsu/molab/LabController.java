@@ -30,12 +30,15 @@ public class LabController {
     private Label fileNameLabel;
     @FXML
     private Button solve;
+    @FXML
+    GridPane diagMatrixPane;
 
     private Fraction[] objF;
     private Fraction[][] constraints;
     private ArrayList<Integer> basis = new ArrayList<Integer>();
     private File curFile = null;
     private Solver solver;
+    StepMatrix diagMatrix;
 
     private TextField generateCell(String text, boolean editable) {
         TextField tf = new TextField();
@@ -169,6 +172,32 @@ public class LabController {
 
     }
 
+    void createDiagMatrixPane() {
+        diagMatrixPane.getChildren().clear();
+        TextField tf;
+
+        //header
+        for (int i = 0; i < diagMatrix.getCols(); i++) {
+            tf = generateCell("x" + (diagMatrix.getoX()[i]+1), false);
+            GridPane.setRowIndex(tf, 0);
+            GridPane.setColumnIndex(tf, i);
+            diagMatrixPane.getChildren().add(tf);
+        }
+        tf = generateCell("b", false);
+        GridPane.setRowIndex(tf, 0);
+        GridPane.setColumnIndex(tf, diagMatrix.getCols());
+        diagMatrixPane.getChildren().add(tf);
+
+        //data
+        for (int i = 0; i < diagMatrix.getRows(); i++) {
+            for (int j=0; j < diagMatrix.getCols()+1; j++) {
+                tf = generateCell(((diagMatrix.getMatrix()).getElement(i,j)).toString(), false);
+                GridPane.setRowIndex(tf, i+1);
+                GridPane.setColumnIndex(tf, j);
+                diagMatrixPane.getChildren().add(tf);
+            }
+        }
+    }
     @FXML
     private void handleNewFile() {
         solver.init();
@@ -182,6 +211,7 @@ public class LabController {
 
     @FXML
     private void handleFileOpen() {
+        //todo не обновляются значения
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(table.getScene().getWindow());
         if (file == null) return;
@@ -260,7 +290,7 @@ public class LabController {
     }
 
     @FXML
-    private void solve() {
+    private void makeDiag() {
         if (basis.size() != solver.getConstraintsN()) {
             System.out.println("n of constraint should be equal to basis length");
             return;
@@ -273,20 +303,21 @@ public class LabController {
         for (int i = 0; i < solver.getConstraintsN(); i++){
             arr1[i] = i;
         }
-        StepMatrix matrix = new StepMatrix(solver.toMatrix(solver.getConstraintsN(), solver.getVarN()+1), arr, arr1);
-        matrix.print();
+        diagMatrix = new StepMatrix(solver.toMatrix(solver.getConstraintsN(), solver.getVarN()+1), arr, arr1);
+        diagMatrix.print();
         //move basis to the left of the matrix
         Collections.sort(basis);
         for (int i = 0; i < basis.size(); i ++) {
-            matrix.swapColumns(i, basis.get(i));
+            diagMatrix.swapColumns(i, basis.get(i));
         }
 
-        matrix.print();
+        diagMatrix.print();
 
         //convert to diagonal view
-        System.out.println("diagonal:");
-        matrix.makeDiagonal();
-        matrix.print();
+        diagMatrix.getMatrix().makeDiagonal();
+        diagMatrix.print();
+        createDiagMatrixPane();
+
 
     }
 

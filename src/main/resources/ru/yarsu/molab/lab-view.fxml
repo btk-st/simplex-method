@@ -11,23 +11,9 @@
 <?import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.yarsu.molab.LabController">
-   <center>
-      <HBox alignment="TOP_LEFT" prefHeight="520.0" prefWidth="572.0" spacing="20.0">
-          <padding>
-              <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-          </padding>
-          <VBox>
-              <GridPane fx:id="objectiveFunction" />
-              <GridPane fx:id="table" />
-          </VBox>
-      
-      
-      </HBox>
-   </center>
    <top>
        <MenuBar fx:id="menuBar" minWidth="200" BorderPane.alignment="CENTER">
            <menus>
@@ -65,7 +51,7 @@
               </valueFactory>
           </Spinner>
            <Button onAction="#apply" text="Применить" />
-         <Button fx:id="solve" mnemonicParsing="false" text="Привести к диагонльной" onAction="#solve"/>
+         <Button fx:id="solve" mnemonicParsing="false" onAction="#makeDiag" text="Привести к диагонльной" />
          <opaqueInsets>
             <Insets />
          </opaqueInsets>
@@ -77,4 +63,17 @@
    <bottom>
        <Label fx:id="fileNameLabel" prefWidth="300" BorderPane.alignment="CENTER" />
    </bottom>
+   <center>
+       <VBox BorderPane.alignment="CENTER">
+         <Label text="Целевая функция" />
+           <GridPane fx:id="objectiveFunction" />
+         <Label text="Ограничения" />
+           <GridPane fx:id="table" />
+         <Label text="Диагональная матрица" />
+           <GridPane fx:id="diagMatrixPane" />
+         <BorderPane.margin>
+            <Insets left="10.0" />
+         </BorderPane.margin>
+       </VBox>
+   </center>
 </BorderPane>

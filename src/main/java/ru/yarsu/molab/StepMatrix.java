@@ -37,20 +37,39 @@ public class StepMatrix {
             System.out.println(oY[i]);
     }
 
-    public void makeDiagonal() {
-        //todo need to check minor before doing!!!
-        for (int j = 0; j < rows; j++) {
-            for (int i =0; i < rows; i++) {
-                //if element on main diagonal or is zero
-                if (i == j || matrix.getElement(i,j).getNumerator() == 0) continue;
-                Fraction multiplier = matrix.getElement(i,j).divide(matrix.getElement(j,j));
-                Fraction[] rowToSubtract =  matrix.rowCopy(j);
-                matrix.multiplyRow(rowToSubtract, multiplier);
-                matrix.multiplyRow(rowToSubtract, new Fraction(-1,1));
-                matrix.addRow(matrix.getRow(i), rowToSubtract);
-            }
-            //divide origin row to get coef 1
-            matrix.multiplyRow(matrix.getRow(j), new Fraction(1,1).divide(matrix.getElement(j,j)));
-        }
+    public Matrix getMatrix() {
+        return matrix;
+    }
+
+    public int getRows() {
+        return rows;
+    }
+
+    public void setRows(int rows) {
+        this.rows = rows;
+    }
+
+    public int getCols() {
+        return cols;
+    }
+
+    public void setCols(int cols) {
+        this.cols = cols;
+    }
+
+    public int[] getoY() {
+        return oY;
+    }
+
+    public void setoY(int[] oY) {
+        this.oY = oY;
+    }
+
+    public int[] getoX() {
+        return oX;
+    }
+
+    public void setoX(int[] oX) {
+        this.oX = oX;
     }
 }

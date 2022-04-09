@@ -22,6 +22,23 @@ public class Matrix {
             matrix[i][dest] = tmp;
         }
     }
+
+    public void makeDiagonal() {
+        //todo need to check minor before doing!!!
+        for (int j = 0; j < rows; j++) {
+            for (int i =0; i < rows; i++) {
+                //if element on main diagonal or is zero
+                if (i == j || matrix[i][j].getNumerator() == 0) continue;
+                Fraction multiplier = matrix[i][j].divide(matrix[j][j]);
+                Fraction[] rowToSubtract =  this.rowCopy(j);
+                this.multiplyRow(rowToSubtract, multiplier);
+                this.multiplyRow(rowToSubtract, new Fraction(-1,1));
+                this.addRow(this.getRow(i), rowToSubtract);
+            }
+            //divide origin row to get coef 1
+            this.multiplyRow(this.getRow(j), new Fraction(1,1).divide(matrix[j][j]));
+        }
+    }
     public void changeRows(int src, int dest) {
         for (int j =0; j < cols; j++) {
             Fraction tmp = matrix[dest][j];
