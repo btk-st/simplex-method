@@ -29,12 +29,10 @@ public class StepMatrix {
     public void print() {
         matrix.print();
         System.out.println("oX");
-        for (int i = 0; i < oX.length; i++)
-            System.out.print(oX[i] + " ");
+        for (int x : oX) System.out.print(x + " ");
         System.out.println();
         System.out.println("oY");
-        for (int i = 0; i < oY.length; i++)
-            System.out.println(oY[i]);
+        for (int j : oY) System.out.println(j);
     }
 
     public Matrix getMatrix() {

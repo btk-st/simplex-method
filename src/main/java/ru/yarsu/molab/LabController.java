@@ -38,7 +38,8 @@ public class LabController {
     private ArrayList<Integer> basis = new ArrayList<Integer>();
     private File curFile = null;
     private Solver solver;
-    StepMatrix diagMatrix;
+    private StepMatrix diagMatrix;
+    private ArrayList<StepMatrix> steps = new ArrayList<StepMatrix>();
 
     private TextField generateCell(String text, boolean editable) {
         TextField tf = new TextField();
@@ -224,8 +225,7 @@ public class LabController {
 
     @FXML
     private void handleFileSave() {
-        saveObjFTable(varNSpinner.getValue());
-        saveConstraintsTable(constraintsNSpinner.getValue(), varNSpinner.getValue());
+        apply();
         if (curFile == null) {
             System.out.println("no active file");
             return;
@@ -304,21 +304,62 @@ public class LabController {
             arr1[i] = i;
         }
         diagMatrix = new StepMatrix(solver.toMatrix(solver.getConstraintsN(), solver.getVarN()+1), arr, arr1);
-        diagMatrix.print();
         //move basis to the left of the matrix
         Collections.sort(basis);
         for (int i = 0; i < basis.size(); i ++) {
             diagMatrix.swapColumns(i, basis.get(i));
         }
 
-        diagMatrix.print();
 
         //convert to diagonal view
         diagMatrix.getMatrix().makeDiagonal();
+        System.out.println("diag matrix:");
         diagMatrix.print();
         createDiagMatrixPane();
 
 
+    }
+
+    @FXML
+    public void startIterations() {
+        //fill simplex matrix from diagonal for the first time
+        //free and basis vars
+        int [] oY = Arrays.copyOf(diagMatrix.getoX(), diagMatrix.getRows());
+        int [] oX = Arrays.copyOfRange(diagMatrix.getoX(), diagMatrix.getRows(), diagMatrix.getoX().length);
+
+        Fraction[][] simplexMatrix = new Fraction[oY.length+1][oX.length+1];
+        //fill basis rows
+        for (int i = 0; i<oY.length; i++) {
+            for (int j = 0; j < oX.length; j++) {
+                simplexMatrix[i][j] = new Fraction(diagMatrix.getMatrix().getElement(i,j+oX.length));
+            }
+            simplexMatrix[i][oX.length] =diagMatrix.getMatrix().getElement(0, oX.length+oY.length);
+        }
+        //fill p
+        //calc objective function coef
+        Fraction coef;
+        for (int j = 0; j < oX.length; j++) {
+            //coef at free var
+            coef = new Fraction(solver.getObjF()[oX[j]]);
+            for (int i = 0; i < oY.length; i++) {
+                coef = coef.add(simplexMatrix[i][j].multiply(new Fraction(-1,1)).multiply(solver.getObjF()[oY[i]]));
+            }
+            simplexMatrix[oY.length][j] = coef;
+        }
+        //calc beta
+        //do the same but without multiplying by -1
+        coef = new Fraction(solver.getObjF()[solver.getObjF().length-1]);
+        for (int i = 0; i < oY.length; i++) {
+            //todo beta at objective function??
+            coef = coef.add(simplexMatrix[i][oX.length].multiply(solver.getObjF()[oY[i]]));
+        }
+        simplexMatrix[oY.length][oX.length] = coef;
+
+        Matrix matrix = new Matrix(simplexMatrix, oY.length+1,oX.length+1 );
+
+
+        steps.add(new StepMatrix(matrix, oX, oY));
+        steps.get(steps.size()-1).print();
     }
 
 

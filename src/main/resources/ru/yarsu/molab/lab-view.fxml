@@ -51,7 +51,8 @@
               </valueFactory>
           </Spinner>
            <Button onAction="#apply" text="Применить" />
-         <Button fx:id="solve" mnemonicParsing="false" onAction="#makeDiag" text="Привести к диагонльной" />
+         <Button fx:id="solve" mnemonicParsing="false" onAction="#makeDiag" text="Привести к диагональной" />
+         <Button  onAction="#startIterations" text="Начать итерации" />
          <opaqueInsets>
             <Insets />
          </opaqueInsets>
