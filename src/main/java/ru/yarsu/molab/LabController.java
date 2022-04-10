@@ -367,9 +367,7 @@ public class LabController {
         simplexMatrix[oY.length][oX.length] = coef.multiply(new Fraction(-1,1));
 
         Matrix matrix = new Matrix(simplexMatrix, oY.length+1,oX.length+1 );
-        System.out.println("simplex matrix");
         StepMatrix stepMatrix = new StepMatrix(matrix, oX, oY);
-        stepMatrix.print();
         steps.add(stepMatrix);
         stepMatrix.findPivotElements();
         if (stepMatrix.getPivotElements().size() == 0) {
@@ -377,7 +375,7 @@ public class LabController {
 //            return;
         }
 //        startIterationButton.setDisable(true);
-        steps.get(steps.size()-1).print();
+//        steps.get(steps.size()-1).print();
         createSimplexStepTable (steps.get(steps.size()-1));
     }
 
@@ -451,12 +449,14 @@ public class LabController {
         }
 
         simplexSteps.getChildren().add(stepPane);
+        simplexSteps.getChildren().add(new Separator());
     }
 
     @FXML
     public void nextStep() {
         //todo delete onAction for prev step labels
         StepMatrix stepMatrix = steps.get(steps.size()-1).nextStepMatrix();
+        steps.add(stepMatrix);
         stepMatrix.findPivotElements();
         createSimplexStepTable(stepMatrix);
 
