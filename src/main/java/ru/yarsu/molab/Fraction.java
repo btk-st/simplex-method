@@ -67,11 +67,20 @@ public class Fraction {
      */
     public int calculateGCD(int numerator, int denominator) {
         if (numerator % denominator == 0) {
-            return denominator;
+            return Math.abs(denominator);
         }
         return calculateGCD(denominator, numerator % denominator);
     }
-
+    /**
+     * @param  fraction
+     * @return -1, 0, 1
+     */
+    public int compare(Fraction fraction) {
+        Fraction result = this.subtract(fraction);
+        if (result.getNumerator() == 0) return 0;
+        if (result.getNumerator() < 0 && result.getDenominator() > 0 || result.getNumerator() > 0 && result.getDenominator() < 0) return -1;
+        return 1;
+    }
     /**
      * Reduce the fraction to lowest form
      */
@@ -79,6 +88,10 @@ public class Fraction {
         int gcd = calculateGCD(numerator, denominator);
         numerator /= gcd;
         denominator /= gcd;
+        if (numerator < 0 && denominator < 0) {
+            numerator = -numerator;
+            denominator = -denominator;
+        }
     }
 
     /**

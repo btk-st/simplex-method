@@ -1,9 +1,10 @@
 package ru.yarsu.molab;
 
-import javafx.scene.layout.GridPane;
+import java.util.ArrayList;
 
 public class StepMatrix {
     private Matrix matrix;
+    private ArrayList<PivotElement> pivotElements;
     private int rows;
     private int cols;
     private int[] oY;
@@ -15,17 +16,25 @@ public class StepMatrix {
         this.oY = new int[rows];
         this.oX = new int[cols];
         this.matrix = matrix;
+        pivotElements = new ArrayList<>();
         //columns order
         System.arraycopy(oY, 0, this.oY, 0, rows);
         System.arraycopy(oX, 0, this.oX, 0, cols);
     }
-
+    public StepMatrix(StepMatrix that) {
+        this(that.getMatrix(), that.getoX(), that.getoY());
+    }
     public void swapColumns(int col1, int col2) {
         matrix.changeCols(col1, col2);
         int tmp = oX[col1];
         oX[col1] = oX[col2];
         oX[col2] = tmp;
     }
+
+    public ArrayList<PivotElement> getPivotElements() {
+        return pivotElements;
+    }
+
     public void print() {
         matrix.print();
         System.out.println("oX");
@@ -34,7 +43,88 @@ public class StepMatrix {
         System.out.println("oY");
         for (int j : oY) System.out.println(j);
     }
+    public void findPivotElements() {
+        //1) for all i>0: p(i) >= 0 then answer
+        int pRow = rows;
+        Fraction zero = new Fraction(0,1);
+        boolean isAnswer = true;
+        for (int j = 0; j <cols; j++) {
+            if (matrix.getElement(pRow, j).compare(zero) == -1)
+                isAnswer = false;
+        }
+        if (isAnswer) {
+            System.out.println("we got answer:");
+            System.out.println("x=");
+            for (int i =0; i < oY.length+1; i++)
+                System.out.print(matrix.getElement(i, cols)+ ", ");
+            for (int i = 0; i < oX.length; i++)
+                System.out.print("0, ");
+            System.out.println();
+            System.out.println("f = " + matrix.getElement(pRow, cols-1));
+            return;
+        }
 
+        //2) if exists pi < 0 AND for all i ai <= 0 then no answer
+        boolean isNoAnswer;
+        for (int j = 0; j < cols; j ++) {
+            if (matrix.getElement(pRow, j).compare(zero) == -1) {
+                isNoAnswer = true;
+                for (int i = 0; i < rows-1; i++) {
+                    if (matrix.getElement(i, j).compare(zero) == 1) {
+                        isNoAnswer = false;
+                        break;
+                    }
+                }
+                if (isNoAnswer) {
+                    System.out.println("no answer");
+                    return;
+                }
+            }
+        }
+
+        //3) if not 1) and 2) then continue process -
+        PivotElement colCandidate;
+        for (int j = 0; j < cols; j++) {
+            colCandidate = null;
+            if (matrix.getElement(pRow, j).compare(zero) == -1) {
+                for (int i= 0; i < rows; i++){
+                    Fraction curEl = matrix.getElement(i,j);
+                    Fraction curValue = matrix.getElement(i,cols).divide(curEl);
+                    if (curEl.compare(zero) < 1) continue;
+                    //if element is first
+                    if (colCandidate == null) {
+                        colCandidate = new PivotElement(i,j, curValue);
+                    } else {
+                        //new best column element
+                        if (curValue.compare(colCandidate.getValue()) == -1) {
+                            colCandidate.setI(i);
+                            colCandidate.setJ(j);
+                            colCandidate.setValue(curValue);
+                        }
+                    }
+
+                }
+                pivotElements.add(colCandidate);
+            }
+
+        }
+        //find best (min value)
+        PivotElement min = null;
+        for (PivotElement cur : pivotElements) {
+            if (min == null) {
+                min = cur;
+            } else {
+                if (cur.getValue().compare(min.getValue()) == -1) {
+                    min = cur;
+                }
+            }
+        }
+        if (min == null) {
+            System.out.println("pivot element not found??");
+        }
+        min.setBest(true);
+        return;
+    }
     public Matrix getMatrix() {
         return matrix;
     }

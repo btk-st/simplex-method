@@ -15,12 +15,27 @@ public class Matrix {
             for (int j =0; j < cols; j++)
                 this.matrix[i][j] = new Fraction(matrix[i][j]);
     }
+    public Matrix(Matrix that) {
+        this(that.getMatrix(), that.getRows(), that.getCols());
+    }
     public void changeCols(int src, int dest) {
         for (int i =0; i < rows; i++) {
             Fraction tmp = matrix[i][src];
             matrix[i][src] = matrix[i][dest];
             matrix[i][dest] = tmp;
         }
+    }
+
+    public Fraction[][] getMatrix() {
+        return matrix;
+    }
+
+    public int getRows() {
+        return rows;
+    }
+
+    public int getCols() {
+        return cols;
     }
 
     public void makeDiagonal() {

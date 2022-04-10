@@ -6,6 +6,7 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory?>
@@ -52,7 +53,8 @@
           </Spinner>
            <Button onAction="#apply" text="Применить" />
          <Button fx:id="solve" mnemonicParsing="false" onAction="#makeDiag" text="Привести к диагональной" />
-         <Button  onAction="#startIterations" text="Начать итерации" />
+         <Button fx:id="startIterationButton" onAction="#startIterations" text="Начать итерации" />
+         <Button mnemonicParsing="false" onAction="#nextStep" text="следующий шаг" />
          <opaqueInsets>
             <Insets />
          </opaqueInsets>
@@ -61,6 +63,7 @@
          </padding>
       </VBox>
    </left>
+
    <bottom>
        <Label fx:id="fileNameLabel" prefWidth="300" BorderPane.alignment="CENTER" />
    </bottom>
@@ -72,6 +75,12 @@
            <GridPane fx:id="table" />
          <Label text="Диагональная матрица" />
            <GridPane fx:id="diagMatrixPane" />
+         <Label text="Шаги симплекс метода" />
+         <ScrollPane>
+            <content>
+               <VBox fx:id="simplexSteps" prefHeight="200.0" prefWidth="300.0" />
+            </content>
+         </ScrollPane>
          <BorderPane.margin>
             <Insets left="10.0" />
          </BorderPane.margin>
