@@ -342,7 +342,7 @@ public class LabController {
         //fill basis rows
         for (int i = 0; i<oY.length; i++) {
             for (int j = 0; j < oX.length; j++) {
-                simplexMatrix[i][j] = new Fraction(diagMatrix.getMatrix().getElement(i,j+oX.length));
+                simplexMatrix[i][j] = new Fraction(diagMatrix.getMatrix().getElement(i,j+oY.length));
             }
             simplexMatrix[i][oX.length] =diagMatrix.getMatrix().getElement(0, oX.length+oY.length);
         }
@@ -364,7 +364,7 @@ public class LabController {
             //todo beta at objective function??
             coef = coef.add(simplexMatrix[i][oX.length].multiply(solver.getObjF()[oY[i]]));
         }
-        simplexMatrix[oY.length][oX.length] = coef;
+        simplexMatrix[oY.length][oX.length] = coef.multiply(new Fraction(-1,1));
 
         Matrix matrix = new Matrix(simplexMatrix, oY.length+1,oX.length+1 );
         System.out.println("simplex matrix");
@@ -374,7 +374,7 @@ public class LabController {
         stepMatrix.findPivotElements();
         if (stepMatrix.getPivotElements().size() == 0) {
             // end or -inf ????
-            return;
+//            return;
         }
 //        startIterationButton.setDisable(true);
         steps.get(steps.size()-1).print();
@@ -421,17 +421,10 @@ public class LabController {
                 GridPane.setRowIndex(tf, i+1);
                 GridPane.setColumnIndex(tf, j+1);
                 stepPane.getChildren().add(tf);
-                //choose ele
-
             }
         }
+
         //highlight pivot elements
-//        tf = (TextField) stepPane.getChildren().get(7);
-//        tf.setStyle("-fx-border-color:red;");
-//        tf = (TextField) stepPane.getChildren().get(8);
-//        tf.setStyle("-fx-border-color:blue;");
-//        tf = (TextField) stepPane.getChildren().get(9);
-//        tf.setStyle("-fx-border-color:green;");
         int startIndex = stepMatrix.getCols() + stepMatrix.getRows() + 3;
         for (PivotElement el : stepMatrix.getPivotElements()) {
             int index = el.getI()*(stepMatrix.getCols()+1)+el.getJ();
@@ -439,11 +432,20 @@ public class LabController {
             if (el.isBest())
                 tf.setStyle("-fx-border-color:red;");
             else
-                tf.setStyle("-fx-border-color:green;");
+                tf.setStyle("-fx-border-color:#27e827;");
             //what to do when choosing pivot el
             tf.setOnMouseClicked(e -> {
+                //old el
+                PivotElement oldPivotElement = stepMatrix.getSelectedPivot();
+                if (oldPivotElement != null) {
+                    TextField textField = (TextField) stepPane.getChildren().get(startIndex+oldPivotElement.getI()*(stepMatrix.getCols()+1)+oldPivotElement.getJ());
+                    textField.setStyle(textField.getStyle()+"-fx-control-inner-background:white;");
+                }
+                //new
                 TextField textField = (TextField) e.getSource();
-                textField.setStyle("-fx-border-color:black;");
+                stepMatrix.setSelectedPivot(el);
+                System.out.println(stepMatrix.getSelectedPivot().getI() + " " + stepMatrix.getSelectedPivot().getJ());
+                textField.setStyle(textField.getStyle() + "-fx-control-inner-background:#2494c4;");
             });
 
         }
@@ -454,7 +456,9 @@ public class LabController {
     @FXML
     public void nextStep() {
         //todo delete onAction for prev step labels
-
+        StepMatrix stepMatrix = steps.get(steps.size()-1).nextStepMatrix();
+        stepMatrix.findPivotElements();
+        createSimplexStepTable(stepMatrix);
 
 
     }

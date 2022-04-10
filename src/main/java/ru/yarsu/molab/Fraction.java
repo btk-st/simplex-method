@@ -149,7 +149,7 @@ public class Fraction {
      */
     @Override
     public String toString() {
-        if (denominator != 1)
+        if (Math.abs(denominator) != 1)
             return this.numerator + "/" + this.denominator;
         else return Integer.toString(this.numerator);
     }

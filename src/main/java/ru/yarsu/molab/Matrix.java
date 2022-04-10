@@ -66,6 +66,11 @@ public class Matrix {
             row[j] = row[j].multiply(multiplier);
         }
     }
+    public void multiplyColumn(int col, Fraction multiplier) {
+        for (int i = 0; i < rows; i++) {
+            matrix[i][col] = matrix[i][col].multiply(multiplier);
+        }
+    }
     public void multiplyCol(int col, Fraction multiplier) {
 
     }
@@ -86,6 +91,9 @@ public class Matrix {
     }
     public Fraction getElement(int i, int j) {
         return matrix[i][j];
+    }
+    public void setElement(int i, int j, Fraction f) {
+        matrix[i][j] = f;
     }
     public void print() {
         for (int i = 0; i < rows; i ++) {

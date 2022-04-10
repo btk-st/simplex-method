@@ -5,17 +5,19 @@ import java.util.ArrayList;
 public class StepMatrix {
     private Matrix matrix;
     private ArrayList<PivotElement> pivotElements;
+    private PivotElement selectedPivot = null;
     private int rows;
     private int cols;
     private int[] oY;
     private int[] oX;
 
     public StepMatrix(Matrix matrix, int[] oX,int[] oY) {
+        //todo matrix deep copy
         this.rows = oY.length;
         this.cols = oX.length;
         this.oY = new int[rows];
         this.oX = new int[cols];
-        this.matrix = matrix;
+        this.matrix = new Matrix(matrix);
         pivotElements = new ArrayList<>();
         //columns order
         System.arraycopy(oY, 0, this.oY, 0, rows);
@@ -34,7 +36,13 @@ public class StepMatrix {
     public ArrayList<PivotElement> getPivotElements() {
         return pivotElements;
     }
+    public PivotElement getSelectedPivot() {
+        return selectedPivot;
+    }
 
+    public void setSelectedPivot(PivotElement selectedPivot) {
+        this.selectedPivot = selectedPivot;
+    }
     public void print() {
         matrix.print();
         System.out.println("oX");
@@ -69,7 +77,7 @@ public class StepMatrix {
         for (int j = 0; j < cols; j ++) {
             if (matrix.getElement(pRow, j).compare(zero) == -1) {
                 isNoAnswer = true;
-                for (int i = 0; i < rows-1; i++) {
+                for (int i = 0; i < rows; i++) {
                     if (matrix.getElement(i, j).compare(zero) == 1) {
                         isNoAnswer = false;
                         break;
@@ -124,6 +132,44 @@ public class StepMatrix {
         }
         min.setBest(true);
         return;
+    }
+    public StepMatrix nextStepMatrix() {
+        matrix.print();
+        StepMatrix newMatrix = new StepMatrix(this);
+        //1:indexes
+        int r = selectedPivot.getI();
+        int s = selectedPivot.getJ();
+        //switch r and s
+        int tmp = newMatrix.getoX()[s];
+        newMatrix.getoX()[s] = newMatrix.getoY()[r];
+        newMatrix.getoY()[r] = tmp;
+        //doing transition
+        //2
+        Fraction newPivotEl = new Fraction(1,1).divide(matrix.getElement(r,s));
+        newMatrix.getMatrix().setElement(r,s, newPivotEl);
+        //3: row
+        for (int j = 0; j < cols+1; j++) {
+            if (j==s) continue;
+            newMatrix.getMatrix().setElement(r, j, matrix.getElement(r,j).multiply(newPivotEl));
+        }
+        //4: col
+        for (int i = 0; i < rows+1; i++) {
+            if (i==r) continue;
+            newMatrix.getMatrix().setElement(i, s, matrix.getElement(i,s).multiply(newPivotEl).multiply(new Fraction(-1,1)));
+        }
+        //5: rest
+        matrix.print();
+        for (int i = 0; i < rows+1; i++) {
+            if (i == r) continue;
+            for (int j = 0; j < cols+1; j++) {
+                if (j == s) continue;
+                Fraction newEl;
+                newEl = matrix.getElement(i,j).subtract(matrix.getElement(i,s).multiply(newMatrix.getMatrix().getElement(r,j)));
+                newMatrix.getMatrix().setElement(i,j,newEl);
+            }
+        }
+
+        return newMatrix;
     }
     public Matrix getMatrix() {
         return matrix;
