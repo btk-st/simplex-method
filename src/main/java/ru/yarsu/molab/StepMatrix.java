@@ -62,16 +62,9 @@ public class StepMatrix {
                 isAnswer = false;
         }
         if (isAnswer) {
-            System.out.println("we got answer:");
-            System.out.println("x=");
-            for (int i =0; i < oY.length+1; i++)
-                System.out.print(matrix.getElement(i, cols)+ ", ");
-            for (int i = 0; i < oX.length; i++)
-                System.out.print("0, ");
-            System.out.println();
-            Fraction xs[] = new Fraction[cols+rows];
-            for (int i = 0; i < oX.length; i++) {
-                xs[oX[i]] = new Fraction(0,1);
+            Fraction[] xs = new Fraction[cols+rows];
+            for (int x : oX) {
+                xs[x] = new Fraction(0, 1);
             }
             for (int i = 0; i < oY.length; i++) {
                 xs[oY[i]] = matrix.getElement(i, cols);
