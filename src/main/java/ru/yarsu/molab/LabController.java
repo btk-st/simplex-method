@@ -234,16 +234,25 @@ public class LabController {
     @FXML
     private void handleFileOpen() {
 
-        //todo не обновляются значения если размеры открытого файла совпадают со старым
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(table.getScene().getWindow());
         if (file == null) return;
+        stepBack.setDisable(true);
+        startIterationButton.setDisable(true);
         answer.setText("");
         diagMatrixPane.getChildren().clear();
         simplexSteps.getChildren().clear();
         curFile = file;
         fileNameLabel.setText("Текущий файл: " + file.getAbsolutePath());
         solver.readFromFile(file);
+        //перерисовать вручную если размеры совпадают
+        if (varNSpinner.getValue() == solver.getVarN()) {
+            createObjFTable(solver.getVarN());
+        }
+        if (constraintsNSpinner.getValue() == solver.getConstraintsN()) {
+            createConstraintsTable(solver.getConstraintsN(), solver.getVarN());
+        }
+        //обновляем значения счетчиков
         constraintsNSpinner.getValueFactory().setValue(solver.getConstraintsN());
         varNSpinner.getValueFactory().setValue(solver.getVarN());
     }

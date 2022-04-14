@@ -105,6 +105,7 @@ public class StepMatrix {
             if (matrix.getElement(pRow, j).compare(zero) == -1) {
                 for (int i= 0; i < rows; i++){
                     Fraction curEl = matrix.getElement(i,j);
+                    if (curEl.compare(zero) == 0) continue;
                     Fraction curValue = matrix.getElement(i,cols).divide(curEl);
                     if (curEl.compare(zero) < 1) continue;
                     //if element is first
@@ -120,7 +121,8 @@ public class StepMatrix {
                     }
 
                 }
-                pivotElements.add(colCandidate);
+                if (colCandidate != null)
+                    pivotElements.add(colCandidate);
             }
 
         }
