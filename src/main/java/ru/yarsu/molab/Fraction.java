@@ -17,26 +17,33 @@ public class Fraction {
         denominator = denr;
         reduce();
     }
+
     //cpu
     public Fraction(Fraction that) {
         this(that.getNumerator(), that.getDenominator());
     }
 
-    public Fraction(String fraction) throws Exception {
+    public Fraction(String fraction) throws IllegalArgumentException {
         String[] nums = fraction.split("/");
-
-        switch (nums.length) {
-            case 1:
-                numerator = Integer.parseInt(nums[0]);
-                denominator = 1;
-                break;
-            case 2:
-                numerator = Integer.parseInt(nums[0]);
-                denominator = Integer.parseInt(nums[1]);
-                break;
-            default:
-                throw new Exception("bad format");
+        try {
+            switch (nums.length) {
+                case 1:
+                    numerator = Integer.parseInt(nums[0]);
+                    denominator = 1;
+                    break;
+                case 2:
+                    numerator = Integer.parseInt(nums[0]);
+                    denominator = Integer.parseInt(nums[1]);
+                    break;
+                default:
+                    throw new IllegalArgumentException("bad format");
+            }
+        } catch (IllegalArgumentException e) {
+            numerator = 0;
+            denominator = 1;
+            throw e;
         }
+
 
         reduce();
 
@@ -71,16 +78,19 @@ public class Fraction {
         }
         return calculateGCD(denominator, numerator % denominator);
     }
+
     /**
-     * @param  fraction
+     * @param fraction
      * @return -1, 0, 1
      */
     public int compare(Fraction fraction) {
         Fraction result = this.subtract(fraction);
         if (result.getNumerator() == 0) return 0;
-        if (result.getNumerator() < 0 && result.getDenominator() > 0 || result.getNumerator() > 0 && result.getDenominator() < 0) return -1;
+        if (result.getNumerator() < 0 && result.getDenominator() > 0 || result.getNumerator() > 0 && result.getDenominator() < 0)
+            return -1;
         return 1;
     }
+
     /**
      * Reduce the fraction to lowest form
      */

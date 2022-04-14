@@ -97,21 +97,12 @@ public class LabController {
         objectiveFunction.getChildren().add(tf);
     }
 
-    private void saveObjFTable(int cols) {
+    private void saveObjFTable(int cols) throws IllegalArgumentException {
         for (int i = cols + 3; i < cols * 2 + 3; i++) {
             String value = ((TextField) (objectiveFunction.getChildren().get(i))).getText();
-            try {
-                objF[i - cols - 3] = new Fraction(value);
-
-            } catch (Exception e) {
-                System.out.println("bad format" + e);
-            }
+            objF[i - cols - 3] = new Fraction(value);
         }
-        try {
-            objF[objF.length - 1] = new Fraction(((TextField) (objectiveFunction.getChildren().get(cols * 2 + 3))).getText());
-        } catch (Exception ex) {
-            System.out.println(ex);
-        }
+        objF[objF.length - 1] = new Fraction(((TextField) (objectiveFunction.getChildren().get(cols * 2 + 3))).getText());
 
     }
 
@@ -168,24 +159,14 @@ public class LabController {
 
     }
 
-    private void saveConstraintsTable(int rows, int cols) {
+    private void saveConstraintsTable(int rows, int cols) throws IllegalArgumentException {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 String value = ((TextField) (table.getChildren().get((i + 1) * (cols + 2) + j + 1))).getText();
-                try {
-                    constraints[i][j] = new Fraction(value);
-
-                } catch (Exception e) {
-                    System.out.println("bad format");
-                }
+                constraints[i][j] = new Fraction(value);
             }
-            try {
-                constraints[i][16] = new Fraction(((TextField) (table.getChildren().get((i + 1) * (cols + 2) + cols + 1))).getText());
-            } catch (Exception ex) {
-                System.out.println(ex);
-            }
+            constraints[i][16] = new Fraction(((TextField) (table.getChildren().get((i + 1) * (cols + 2) + cols + 1))).getText());
         }
-
     }
 
     private void createDiagMatrixPane() {
@@ -259,7 +240,11 @@ public class LabController {
 
     @FXML
     private void handleFileSave() {
-        apply();
+        try {
+            apply();
+        } catch (IllegalArgumentException e) {
+            alert("Проверьте правильность введенных данных. Файл не был сохранен");
+        }
         if (curFile == null) {
             System.out.println("no active file");
             return;
@@ -290,7 +275,7 @@ public class LabController {
     }
 
     @FXML
-    private void apply() {
+    private void apply() throws IllegalArgumentException{
         saveObjFTable(varNSpinner.getValue());
         saveConstraintsTable(constraintsNSpinner.getValue(), varNSpinner.getValue());
         System.out.println("saved:");
@@ -335,14 +320,19 @@ public class LabController {
 
     @FXML
     private void startCalc() {
+        //save data
+        try {
+            apply();
+        } catch (IllegalArgumentException e) {
+            alert("Праверьте правильность введенных данных");
+            return;
+        }
         answer.setText("");
         //delete simplex steps
         simplexSteps.getChildren().clear();
         steps.clear();
         diagMatrix = null;
         diagMatrixPane.getChildren().clear();
-        //save data
-        apply();
         if (basis.size() != solver.getConstraintsN()) {
             startIterationButton.setDisable(true);
             alert("Выбрано недостаточно базисных переменных");
@@ -374,7 +364,7 @@ public class LabController {
 
         //auto solve
         if (autoSolve.isSelected()) {
-            while (steps.size() == 0 || steps.get(steps.size()-1).getPivotElements().size() != 0) {
+            while (steps.size() == 0 || steps.get(steps.size() - 1).getPivotElements().size() != 0) {
                 startIterations();
             }
         } else {
@@ -454,7 +444,7 @@ public class LabController {
         TextField tf;
 
         //header
-        tf = generateCell("x(" + (steps.size()-1) + ")", false);
+        tf = generateCell("x(" + (steps.size() - 1) + ")", false);
         GridPane.setRowIndex(tf, 0);
         GridPane.setColumnIndex(tf, 0);
         stepPane.getChildren().add(tf);

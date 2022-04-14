@@ -57,10 +57,8 @@
             </Spinner>
             <Button fx:id="solve" mnemonicParsing="false" onAction="#startCalc" text="Начать"/>
             <HBox>
-                <children>
-                    <Label text="Решать автоматически?"/>
-                    <CheckBox fx:id="autoSolve" selected="false"/>
-                </children>
+                <Label text="Решать автоматически?"/>
+                <CheckBox fx:id="autoSolve" selected="false"/>
             </HBox>
             <opaqueInsets>
                 <Insets/>
@@ -84,15 +82,13 @@
             <GridPane fx:id="diagMatrixPane"/>
             <Label text="Шаги симплекс метода"/>
             <HBox>
-                <children>
-                    <Button fx:id="stepBack"  focusTraversable="false" prefWidth="50" disable="true" onAction="#stepBack" text="◀"/>
-                    <Button fx:id="startIterationButton" focusTraversable="false" prefWidth="50" disable="true" onAction="#startIterations" text="▶"/>
-                </children>
+                <Button fx:id="stepBack" focusTraversable="false" prefWidth="50" disable="true" onAction="#stepBack"
+                        text="◀"/>
+                <Button fx:id="startIterationButton" focusTraversable="false" prefWidth="50" disable="true"
+                        onAction="#startIterations" text="▶"/>
             </HBox>
             <ScrollPane>
-                <content>
-                    <VBox fx:id="simplexSteps" spacing="15.0" prefHeight="340.0" prefWidth="300.0"/>
-                </content>
+                <VBox fx:id="simplexSteps" spacing="15.0" prefHeight="340.0" prefWidth="300.0"/>
             </ScrollPane>
             <HBox>
                 <Label text="Ответ: "/>
