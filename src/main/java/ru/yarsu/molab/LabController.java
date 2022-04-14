@@ -207,6 +207,7 @@ public class LabController {
     }
     @FXML
     private void handleNewFile() {
+        answer.setText("");
         startIterationButton.setDisable(true);
         stepBack.setDisable(true);
         diagMatrixPane.getChildren().clear();
@@ -227,6 +228,7 @@ public class LabController {
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(table.getScene().getWindow());
         if (file == null) return;
+        answer.setText("");
         diagMatrixPane.getChildren().clear();
         simplexSteps.getChildren().clear();
         curFile = file;
@@ -365,7 +367,7 @@ public class LabController {
                 for (int j = 0; j < oX.length; j++) {
                     simplexMatrix[i][j] = new Fraction(diagMatrix.getMatrix().getElement(i,j+oY.length));
                 }
-                simplexMatrix[i][oX.length] =diagMatrix.getMatrix().getElement(0, oX.length+oY.length);
+                simplexMatrix[i][oX.length] =diagMatrix.getMatrix().getElement(i, oX.length+oY.length);
             }
             //fill p
             //calc objective function coef

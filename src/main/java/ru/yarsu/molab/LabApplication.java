@@ -11,7 +11,7 @@ public class LabApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(LabApplication.class.getResource("lab-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 1000, 700);
+        Scene scene = new Scene(fxmlLoader.load(), 1000, 800);
 
         stage.setTitle("Simplex method");
         stage.setScene(scene);
