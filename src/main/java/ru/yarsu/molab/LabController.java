@@ -34,6 +34,10 @@ public class LabController {
     GridPane diagMatrixPane;
     @FXML
     Button startIterationButton;
+    @FXML
+    Button stepBack;
+    @FXML
+    Label answer;
 
     private Fraction[] objF;
     private Fraction[][] constraints;
@@ -118,7 +122,7 @@ public class LabController {
             int finalI = i;
             tf.setOnMouseClicked(e -> {
                 TextField textField = (TextField) e.getSource();
-                if (!basis.contains(finalI-1)) {
+                if (!basis.contains(finalI-1) && basis.size() < solver.getConstraintsN()) {
                     basis.add(finalI-1);
                     textField.setStyle("-fx-border-color:red;");
                 }
@@ -203,6 +207,8 @@ public class LabController {
     }
     @FXML
     private void handleNewFile() {
+        startIterationButton.setDisable(true);
+        stepBack.setDisable(true);
         diagMatrixPane.getChildren().clear();
         simplexSteps.getChildren().clear();
         solver.init();
@@ -216,12 +222,13 @@ public class LabController {
 
     @FXML
     private void handleFileOpen() {
-        diagMatrixPane.getChildren().clear();
-        simplexSteps.getChildren().clear();
-        //todo не обновляются значения
+
+        //todo не обновляются значения если размеры открытого файла совпадают со старым
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(table.getScene().getWindow());
         if (file == null) return;
+        diagMatrixPane.getChildren().clear();
+        simplexSteps.getChildren().clear();
         curFile = file;
         fileNameLabel.setText("Текущий файл: " + file.getAbsolutePath());
         solver.readFromFile(file);
@@ -294,18 +301,30 @@ public class LabController {
                 }
         );
     }
+    public void alert(String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setHeaderText(message);
+        alert.setContentText("");
 
+        alert.showAndWait();
+    }
     @FXML
-    private void makeDiag() {
-        //todo delete apply button?
+    private void startCalc() {
+        answer.setText("");
         //delete simplex steps
         simplexSteps.getChildren().clear();
+        steps.clear();
+        diagMatrix = null;
+        diagMatrixPane.getChildren().clear();
         //save data
         apply();
         if (basis.size() != solver.getConstraintsN()) {
-            System.out.println("n of constraint should be equal to basis length");
+            startIterationButton.setDisable(true);
+            alert("Выбрано недостаточно базисных переменных");
             return;
         }
+        //enable step button
+        startIterationButton.setDisable(false);
         int[] arr = new int[solver.getVarN()];
         for (int i = 0; i < solver.getVarN(); i++){
             arr[i] = i;
@@ -328,65 +347,79 @@ public class LabController {
         diagMatrix.print();
         createDiagMatrixPane();
 
-
+        startIterations();
     }
 
-    @FXML
     public void startIterations() {
-        //fill simplex matrix from diagonal for the first time
-        //free and basis vars
-        int [] oY = Arrays.copyOf(diagMatrix.getoX(), diagMatrix.getRows());
-        int [] oX = Arrays.copyOfRange(diagMatrix.getoX(), diagMatrix.getRows(), diagMatrix.getoX().length);
+        StepMatrix stepMatrix;
+        //if first step
+        if (steps.size() == 0) {
+            //fill simplex matrix from diagonal for the first time
+            //free and basis vars
+            int [] oY = Arrays.copyOf(diagMatrix.getoX(), diagMatrix.getRows());
+            int [] oX = Arrays.copyOfRange(diagMatrix.getoX(), diagMatrix.getRows(), diagMatrix.getoX().length);
 
-        Fraction[][] simplexMatrix = new Fraction[oY.length+1][oX.length+1];
-        //fill basis rows
-        for (int i = 0; i<oY.length; i++) {
+            Fraction[][] simplexMatrix = new Fraction[oY.length+1][oX.length+1];
+            //fill basis rows
+            for (int i = 0; i<oY.length; i++) {
+                for (int j = 0; j < oX.length; j++) {
+                    simplexMatrix[i][j] = new Fraction(diagMatrix.getMatrix().getElement(i,j+oY.length));
+                }
+                simplexMatrix[i][oX.length] =diagMatrix.getMatrix().getElement(0, oX.length+oY.length);
+            }
+            //fill p
+            //calc objective function coef
+            Fraction coef;
             for (int j = 0; j < oX.length; j++) {
-                simplexMatrix[i][j] = new Fraction(diagMatrix.getMatrix().getElement(i,j+oY.length));
+                //coef at free var
+                coef = new Fraction(solver.getObjF()[oX[j]]);
+                for (int i = 0; i < oY.length; i++) {
+                    coef = coef.add(simplexMatrix[i][j].multiply(new Fraction(-1,1)).multiply(solver.getObjF()[oY[i]]));
+                }
+                simplexMatrix[oY.length][j] = coef;
             }
-            simplexMatrix[i][oX.length] =diagMatrix.getMatrix().getElement(0, oX.length+oY.length);
-        }
-        //fill p
-        //calc objective function coef
-        Fraction coef;
-        for (int j = 0; j < oX.length; j++) {
-            //coef at free var
-            coef = new Fraction(solver.getObjF()[oX[j]]);
+            //calc beta
+            //do the same but without multiplying by -1
+            coef = new Fraction(solver.getObjF()[solver.getObjF().length-1]);
             for (int i = 0; i < oY.length; i++) {
-                coef = coef.add(simplexMatrix[i][j].multiply(new Fraction(-1,1)).multiply(solver.getObjF()[oY[i]]));
+                //todo beta at objective function??
+                coef = coef.add(simplexMatrix[i][oX.length].multiply(solver.getObjF()[oY[i]]));
             }
-            simplexMatrix[oY.length][j] = coef;
-        }
-        //calc beta
-        //do the same but without multiplying by -1
-        coef = new Fraction(solver.getObjF()[solver.getObjF().length-1]);
-        for (int i = 0; i < oY.length; i++) {
-            //todo beta at objective function??
-            coef = coef.add(simplexMatrix[i][oX.length].multiply(solver.getObjF()[oY[i]]));
-        }
-        simplexMatrix[oY.length][oX.length] = coef.multiply(new Fraction(-1,1));
+            simplexMatrix[oY.length][oX.length] = coef.multiply(new Fraction(-1,1));
 
-        Matrix matrix = new Matrix(simplexMatrix, oY.length+1,oX.length+1 );
-        StepMatrix stepMatrix = new StepMatrix(matrix, oX, oY);
+            Matrix matrix = new Matrix(simplexMatrix, oY.length+1,oX.length+1 );
+            stepMatrix = new StepMatrix(matrix, oX, oY);
+        } else {
+            stepMatrix = steps.get(steps.size()-1).nextStepMatrix();
+        }
         steps.add(stepMatrix);
         stepMatrix.findPivotElements();
         if (stepMatrix.getPivotElements().size() == 0) {
+            startIterationButton.setDisable(true);
+            answer.setText(stepMatrix.getAnswer());
             // end or -inf ????
-//            return;
         }
-//        startIterationButton.setDisable(true);
-//        steps.get(steps.size()-1).print();
-        createSimplexStepTable (steps.get(steps.size()-1));
-    }
+        stepBack.setDisable(steps.size() == 1);
+        createSimplexStepTable(stepMatrix);
 
+    }
+    @FXML
+    private void stepBack() {
+        answer.setText("");
+        int stepToRemove = steps.size()-1;
+        steps.remove(stepToRemove);
+        simplexSteps.getChildren().remove(stepToRemove);
+        startIterationButton.setDisable(false);
+        //if first step
+        stepBack.setDisable(steps.size() == 1);
+    }
     private void createSimplexStepTable(StepMatrix stepMatrix) {
         GridPane stepPane = new GridPane();
 
         TextField tf;
 
         //header
-        //todo step number
-        tf = generateCell("x(0)", false);
+        tf = generateCell("x(" + steps.size() + ")", false);
         GridPane.setRowIndex(tf, 0);
         GridPane.setColumnIndex(tf, 0);
         stepPane.getChildren().add(tf);
@@ -427,12 +460,17 @@ public class LabController {
         for (PivotElement el : stepMatrix.getPivotElements()) {
             int index = el.getI()*(stepMatrix.getCols()+1)+el.getJ();
             tf = (TextField) stepPane.getChildren().get(startIndex+index);
-            if (el.isBest())
-                tf.setStyle("-fx-border-color:red;");
+            if (el.isBest()) {
+                tf.setStyle("-fx-border-color:red;-fx-control-inner-background:#2494c4;");
+                stepMatrix.setSelectedPivot(el);
+            }
             else
                 tf.setStyle("-fx-border-color:#27e827;");
             //what to do when choosing pivot el
+            final int curStep = steps.size();
             tf.setOnMouseClicked(e -> {
+                //block selection if it is not our current step
+                if (steps.size() != curStep) return;
                 //old el
                 PivotElement oldPivotElement = stepMatrix.getSelectedPivot();
                 if (oldPivotElement != null) {
@@ -449,17 +487,6 @@ public class LabController {
         }
 
         simplexSteps.getChildren().add(stepPane);
-        simplexSteps.getChildren().add(new Separator());
     }
 
-    @FXML
-    public void nextStep() {
-        //todo delete onAction for prev step labels
-        StepMatrix stepMatrix = steps.get(steps.size()-1).nextStepMatrix();
-        steps.add(stepMatrix);
-        stepMatrix.findPivotElements();
-        createSimplexStepTable(stepMatrix);
-
-
-    }
 }

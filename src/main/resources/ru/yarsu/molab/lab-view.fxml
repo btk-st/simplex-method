@@ -14,76 +14,85 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.yarsu.molab.LabController">
-   <top>
-       <MenuBar fx:id="menuBar" minWidth="200" BorderPane.alignment="CENTER">
-           <menus>
-               <Menu text="Файл">
-                   <items>
-                       <MenuItem onAction="#handleNewFile" text="Новый файл" />
-                       <MenuItem onAction="#handleFileOpen" text="Открыть" />
-                       <MenuItem onAction="#handleFileSave" text="Сохранить" />
-                       <MenuItem onAction="#handleFileSaveAs" text="Сохранить как" />
-                   </items>
-               </Menu>
-               <Menu text="О программе">
-                   <items>
-                       <MenuItem onAction="#handleAuthor" text="Автор" />
-                       <SeparatorMenuItem />
-                       <MenuItem onAction="#handleHelp" text="Помощь" />
-                   </items>
-               </Menu>
-           </menus>
-       </MenuBar>
-   </top>
-   <left>
-      <VBox alignment="TOP_LEFT" prefHeight="520.0" prefWidth="142.0" spacing="10.0" BorderPane.alignment="CENTER">
-          <Label text="число переменных" />
-          <Spinner fx:id="varNSpinner" editable="true" prefHeight="25.0" prefWidth="114.0">
-              <valueFactory>
-                  <SpinnerValueFactory.IntegerSpinnerValueFactory max="16" min="1" />
-              </valueFactory>
-          </Spinner>
-   
-             <Label text="число ограничений" />
-          <Spinner fx:id="constraintsNSpinner" editable="true" prefHeight="25.0" prefWidth="113.0">
-              <valueFactory>
-                  <SpinnerValueFactory.IntegerSpinnerValueFactory max="16" min="1" />
-              </valueFactory>
-          </Spinner>
-           <Button onAction="#apply" text="Применить" />
-         <Button fx:id="solve" mnemonicParsing="false" onAction="#makeDiag" text="Привести к диагональной" />
-         <Button fx:id="startIterationButton" onAction="#startIterations" text="Начать итерации" />
-         <Button mnemonicParsing="false" onAction="#nextStep" text="следующий шаг" />
-         <opaqueInsets>
-            <Insets />
-         </opaqueInsets>
-         <padding>
-            <Insets left="10.0" top="10.0" />
-         </padding>
-      </VBox>
-   </left>
+<?import javafx.scene.layout.HBox?>
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ru.yarsu.molab.LabController">
+    <top>
+        <MenuBar fx:id="menuBar" minWidth="200" BorderPane.alignment="CENTER">
+            <menus>
+                <Menu text="Файл">
+                    <items>
+                        <MenuItem onAction="#handleNewFile" text="Новый файл"/>
+                        <MenuItem onAction="#handleFileOpen" text="Открыть"/>
+                        <MenuItem onAction="#handleFileSave" text="Сохранить"/>
+                        <MenuItem onAction="#handleFileSaveAs" text="Сохранить как"/>
+                    </items>
+                </Menu>
+                <Menu text="О программе">
+                    <items>
+                        <MenuItem onAction="#handleAuthor" text="Автор"/>
+                        <SeparatorMenuItem/>
+                        <MenuItem onAction="#handleHelp" text="Помощь"/>
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+    </top>
+    <left>
+        <VBox alignment="TOP_LEFT" prefHeight="520.0" prefWidth="142.0" spacing="10.0" BorderPane.alignment="CENTER">
+            <Label text="число переменных"/>
+            <Spinner fx:id="varNSpinner" editable="true" prefHeight="25.0" prefWidth="114.0">
+                <valueFactory>
+                    <SpinnerValueFactory.IntegerSpinnerValueFactory max="16" min="1"/>
+                </valueFactory>
+            </Spinner>
 
-   <bottom>
-       <Label fx:id="fileNameLabel" prefWidth="300" BorderPane.alignment="CENTER" />
-   </bottom>
-   <center>
-       <VBox BorderPane.alignment="CENTER">
-         <Label text="Целевая функция" />
-           <GridPane fx:id="objectiveFunction" />
-         <Label text="Ограничения" />
-           <GridPane fx:id="table" />
-         <Label text="Диагональная матрица" />
-           <GridPane fx:id="diagMatrixPane" />
-         <Label text="Шаги симплекс метода" />
-         <ScrollPane>
-            <content>
-               <VBox fx:id="simplexSteps" prefHeight="200.0" prefWidth="300.0" />
-            </content>
-         </ScrollPane>
-         <BorderPane.margin>
-            <Insets left="10.0" />
-         </BorderPane.margin>
-       </VBox>
-   </center>
+            <Label text="число ограничений"/>
+            <Spinner fx:id="constraintsNSpinner" editable="true" prefHeight="25.0" prefWidth="113.0">
+                <valueFactory>
+                    <SpinnerValueFactory.IntegerSpinnerValueFactory max="16" min="1"/>
+                </valueFactory>
+            </Spinner>
+            <Button fx:id="solve" mnemonicParsing="false" onAction="#startCalc" text="Начать"/>
+            <opaqueInsets>
+                <Insets/>
+            </opaqueInsets>
+            <padding>
+                <Insets left="10.0" top="10.0"/>
+            </padding>
+        </VBox>
+    </left>
+
+    <bottom>
+        <Label fx:id="fileNameLabel" prefWidth="300" BorderPane.alignment="CENTER"/>
+    </bottom>
+    <center>
+        <VBox BorderPane.alignment="CENTER">
+            <Label text="Целевая функция"/>
+            <GridPane fx:id="objectiveFunction"/>
+            <Label text="Ограничения"/>
+            <GridPane fx:id="table"/>
+            <Label text="Диагональная матрица"/>
+            <GridPane fx:id="diagMatrixPane"/>
+            <Label text="Шаги симплекс метода"/>
+            <HBox>
+                <children>
+                    <Button fx:id="stepBack"  focusTraversable="false" prefWidth="50" disable="true" onAction="#stepBack" text="◀"/>
+                    <Button fx:id="startIterationButton" focusTraversable="false" prefWidth="50" disable="true" onAction="#startIterations" text="▶"/>
+                </children>
+            </HBox>
+            <ScrollPane>
+                <content>
+                    <VBox fx:id="simplexSteps" spacing="15.0" prefHeight="340.0" prefWidth="300.0"/>
+                </content>
+            </ScrollPane>
+            <HBox>
+                <Label text="Ответ: "/>
+                <Label fx:id="answer"/>
+            </HBox>
+            <BorderPane.margin>
+                <Insets left="10.0"/>
+            </BorderPane.margin>
+        </VBox>
+    </center>
 </BorderPane>

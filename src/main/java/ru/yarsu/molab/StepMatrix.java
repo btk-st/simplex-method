@@ -10,9 +10,10 @@ public class StepMatrix {
     private int cols;
     private int[] oY;
     private int[] oX;
+    private String answer;
 
     public StepMatrix(Matrix matrix, int[] oX,int[] oY) {
-        //todo matrix deep copy
+        this.answer = "";
         this.rows = oY.length;
         this.cols = oX.length;
         this.oY = new int[rows];
@@ -69,6 +70,7 @@ public class StepMatrix {
                 System.out.print("0, ");
             System.out.println();
             System.out.println("f = " + matrix.getElement(pRow, cols-1));
+            answer = "f = " + matrix.getElement(pRow, cols-1);
             return;
         }
 
@@ -84,6 +86,7 @@ public class StepMatrix {
                     }
                 }
                 if (isNoAnswer) {
+                    answer = "Функция неограничена снизу";
                     System.out.println("no answer");
                     return;
                 }
@@ -132,6 +135,9 @@ public class StepMatrix {
         }
         min.setBest(true);
         return;
+    }
+    public String getAnswer() {
+        return answer;
     }
     public StepMatrix nextStepMatrix() {
         matrix.print();
