@@ -62,6 +62,7 @@ public class LabController {
     private void createObjFTable(int varN) {
         objectiveFunction.getChildren().clear();
         TextField tf = generateCell("", false);
+        tf.setFocusTraversable(false);
         GridPane.setRowIndex(tf, 0);
         GridPane.setColumnIndex(tf, 0);
         objectiveFunction.getChildren().add(tf);
@@ -69,17 +70,21 @@ public class LabController {
             tf = generateCell("c" + i, false);
             GridPane.setRowIndex(tf, 0);
             GridPane.setColumnIndex(tf, i);
+            tf.setFocusTraversable(false);
             objectiveFunction.getChildren().add(tf);
         }
         tf = generateCell("c", false);
+        tf.setFocusTraversable(false);
         GridPane.setRowIndex(tf, 0);
         GridPane.setColumnIndex(tf, varN + 1);
         objectiveFunction.getChildren().add(tf);
 
         tf = generateCell("f(x)", false);
+        tf.setFocusTraversable(false);
         GridPane.setRowIndex(tf, 1);
         GridPane.setColumnIndex(tf, 0);
         objectiveFunction.getChildren().add(tf);
+        //data
         for (int i = 1; i < varN + 1; i++) {
             tf = generateCell(objF[i - 1].toString(), true);
             GridPane.setRowIndex(tf, 1);
@@ -114,12 +119,13 @@ public class LabController {
         table.getChildren().clear();
         basis.clear();
         TextField tf = generateCell("", false);
+        tf.setFocusTraversable(false);
         GridPane.setRowIndex(tf, 0);
         GridPane.setColumnIndex(tf, 0);
         table.getChildren().add(tf);
         for (int i = 1; i < varN + 1; i++) {
             tf = generateCell("a" + i, false);
-
+            tf.setFocusTraversable(false);
             //eventhandler to get chosen basis vars
             int finalI = i;
             tf.setOnMouseClicked(e -> {
@@ -137,6 +143,7 @@ public class LabController {
             table.getChildren().add(tf);
         }
         tf = generateCell("b", false);
+        tf.setFocusTraversable(false);
         GridPane.setRowIndex(tf, 0);
         GridPane.setColumnIndex(tf, varN + 1);
         table.getChildren().add(tf);
@@ -145,6 +152,7 @@ public class LabController {
             tf = generateCell("f" + i + "(x)", false);
             GridPane.setRowIndex(tf, i);
             GridPane.setColumnIndex(tf, 0);
+            tf.setFocusTraversable(false);
             table.getChildren().add(tf);
             for (int j = 1; j < varN + 1; j++) {
                 tf = generateCell(constraints[i - 1][j - 1].toString(), true);
@@ -437,7 +445,7 @@ public class LabController {
         TextField tf;
 
         //header
-        tf = generateCell("x(" + steps.size() + ")", false);
+        tf = generateCell("x(" + (steps.size()-1) + ")", false);
         GridPane.setRowIndex(tf, 0);
         GridPane.setColumnIndex(tf, 0);
         stepPane.getChildren().add(tf);
