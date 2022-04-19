@@ -27,6 +27,21 @@ public class StepMatrix {
     public StepMatrix(StepMatrix that) {
         this(that.getMatrix(), that.getoX(), that.getoY());
     }
+    public void deleteCol(int j) {
+        //уменьшаем число столбцов
+        cols--;
+        //удаляем столбец в матрице
+        matrix.deleteCol(j);
+        //удаляем из oX
+        int[] newoX = new int[cols];
+        for (int i=0; i<j; i++) {
+            newoX[i] = oX[i];
+        }
+        for (int i=j; i<cols; i++) {
+            newoX[i] = oX[i+1];
+        }
+        oX = newoX;
+    }
     public void swapColumns(int col1, int col2) {
         matrix.changeCols(col1, col2);
         int tmp = oX[col1];
@@ -45,6 +60,7 @@ public class StepMatrix {
         this.selectedPivot = selectedPivot;
     }
     public void print() {
+        System.out.println("stepMatrix:");
         matrix.print();
         System.out.println("oX");
         for (int x : oX) System.out.print(x + " ");

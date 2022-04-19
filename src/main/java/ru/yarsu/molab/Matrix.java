@@ -37,7 +37,35 @@ public class Matrix {
     public int getCols() {
         return cols;
     }
-
+    private Fraction cofactor(int i, int j) {
+        int n = matrix.length;
+        Fraction[][] newMatr = new Fraction[n-1][n-1];
+        int realI = 0, realJ = 0;
+        for (int i1 = 0; i1 < n; i1++) {
+            if (i == i1) continue;
+            realJ = 0;
+            for (int j1 = 0; j1 < n; j1++) {
+                if (j == j1) continue;
+                newMatr[realI][realJ++] = matrix[i1][j1];
+            }
+            realI++;
+        }
+        Matrix minorMatrix = new Matrix(newMatr, n-1, n-1);
+        Fraction det = minorMatrix.calcDet();
+        if ((i+j)%2 == 1) det = det.multiply(new Fraction(-1,1));
+        return det;
+    }
+    public Fraction calcDet() {
+        //n is row count
+        int n = matrix.length;
+        Fraction det = new Fraction(0,1);
+        if (n == 1) return matrix[0][0];
+        //todo find best row/col
+        for (int j = 0; j < n; j++) {
+            det = det.add(matrix[0][j].multiply(cofactor(0, j)));
+        }
+        return det;
+    }
     public void makeDiagonal() {
         //todo need to check minor before doing!!!
         for (int j = 0; j < rows; j++) {
@@ -73,6 +101,19 @@ public class Matrix {
     }
     public void multiplyCol(int col, Fraction multiplier) {
 
+    }
+    public void deleteCol(int col) {
+        Fraction[][] newMatr = new Fraction[rows][cols-1];
+        cols--;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < col; j++) {
+                newMatr[i][j] = matrix[i][j];
+            }
+            for (int j = col; j < cols; j++) {
+                newMatr[i][j] = matrix[i][j+1];
+            }
+        }
+        matrix = newMatr;
     }
     public Fraction[] rowCopy(int row) {
         Fraction[] res = new Fraction[cols];

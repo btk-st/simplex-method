@@ -31,7 +31,40 @@ public class Solver {
             }
         }
     }
-
+    public Solver toSupportingTask() {
+        //решаем вспомогательную задачу
+        int n = varN;
+        int m = constraintsN;
+        Solver artificialSolver = new Solver(n+m,m);
+        //занулили
+        artificialSolver.init();
+        //целевая ф-я
+        //ставим коеф 1 у целевой ф-ии
+        for (int i = n; i < n+m; i++) {
+            artificialSolver.getObjF()[i] = new Fraction(1,1);
+        }
+        //ограничения
+        //скопируем значения из оригинальной задачи
+        for (int i = 0; i <m; i++) {
+            for (int j = 0; j < n; j ++) {
+                artificialSolver.getConstraints()[i][j] = new Fraction(constraints[i][j]);
+            }
+        }
+        //1 0 0.. 0 1 0.. 0 0 1 для вспомогательных
+        for (int i = 0; i < m; i++) {
+            for (int j = n; j < n+m; j++) {
+                Fraction fraction;
+                fraction = (j-n == i) ? new Fraction(1,1) : new Fraction(0,1);
+                artificialSolver.getConstraints()[i][j] = fraction;
+            }
+        }
+        //todo максимальное число должно быть с учетом дополнительных переменных
+        //столбец свободных членов
+        for (int i = 0; i < m; i++) {
+            artificialSolver.getConstraints()[i][MAX_SIZE-1] = new Fraction(constraints[i][MAX_SIZE-1]);
+        }
+        return artificialSolver;
+    }
     public void readFromFile(File file) {
         Scanner sc;
         try {

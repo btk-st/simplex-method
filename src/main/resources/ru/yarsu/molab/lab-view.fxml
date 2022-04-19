@@ -21,23 +21,17 @@
             fx:controller="ru.yarsu.molab.LabController">
     <top>
         <MenuBar fx:id="menuBar" minWidth="200" BorderPane.alignment="CENTER">
-            <menus>
-                <Menu text="Файл">
-                    <items>
-                        <MenuItem onAction="#handleNewFile" text="Новый файл"/>
-                        <MenuItem onAction="#handleFileOpen" text="Открыть"/>
-                        <MenuItem onAction="#handleFileSave" text="Сохранить"/>
-                        <MenuItem onAction="#handleFileSaveAs" text="Сохранить как"/>
-                    </items>
-                </Menu>
-                <Menu text="О программе">
-                    <items>
-                        <MenuItem onAction="#handleAuthor" text="Автор"/>
-                        <SeparatorMenuItem/>
-                        <MenuItem onAction="#handleHelp" text="Помощь"/>
-                    </items>
-                </Menu>
-            </menus>
+            <Menu text="Файл">
+                <MenuItem onAction="#handleNewFile" text="Новый файл"/>
+                <MenuItem onAction="#handleFileOpen" text="Открыть"/>
+                <MenuItem onAction="#handleFileSave" text="Сохранить"/>
+                <MenuItem onAction="#handleFileSaveAs" text="Сохранить как"/>
+            </Menu>
+            <Menu text="О программе">
+                <MenuItem onAction="#handleAuthor" text="Автор"/>
+                <SeparatorMenuItem/>
+                <MenuItem onAction="#handleHelp" text="Помощь"/>
+            </Menu>
         </MenuBar>
     </top>
     <left>
@@ -60,6 +54,10 @@
                 <Label text="Решать автоматически?"/>
                 <CheckBox fx:id="autoSolve" selected="false"/>
             </HBox>
+            <HBox>
+                <Label text="Использовать искусственный базис?"/>
+                <CheckBox fx:id="artifBasis" selected="false"/>
+            </HBox>
             <opaqueInsets>
                 <Insets/>
             </opaqueInsets>
@@ -80,6 +78,10 @@
             <GridPane fx:id="table"/>
             <Label text="Диагональная матрица"/>
             <GridPane fx:id="diagMatrixPane"/>
+            <Label text="Шаги искусственного базиса"/>
+            <ScrollPane>
+                <VBox spacing="15.0" fx:id="artificialBasisPane"/>
+            </ScrollPane>
             <Label text="Шаги симплекс метода"/>
             <HBox>
                 <Button fx:id="stepBack" focusTraversable="false" prefWidth="50" disable="true" onAction="#stepBack"
