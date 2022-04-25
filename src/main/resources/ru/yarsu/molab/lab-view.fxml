@@ -58,6 +58,12 @@
                 <Label text="Использовать искусственный базис?"/>
                 <CheckBox fx:id="artifBasis" selected="false"/>
             </HBox>
+            <HBox>
+                <Button fx:id="stepBack" focusTraversable="false" prefWidth="50" disable="true" onAction="#stepBack"
+                        text="◀"/>
+                <Button fx:id="startIterationButton" focusTraversable="false" prefWidth="50" disable="true"
+                        onAction="#nextStep" text="▶"/>
+            </HBox>
             <opaqueInsets>
                 <Insets/>
             </opaqueInsets>
@@ -80,15 +86,9 @@
             <GridPane fx:id="diagMatrixPane"/>
             <Label text="Шаги искусственного базиса"/>
             <ScrollPane>
-                <VBox spacing="15.0" fx:id="artificialBasisPane"/>
+                <VBox spacing="15.0" prefHeight="200.0" prefWidth="300.0" fx:id="artificialBasisPane"/>
             </ScrollPane>
             <Label text="Шаги симплекс метода"/>
-            <HBox>
-                <Button fx:id="stepBack" focusTraversable="false" prefWidth="50" disable="true" onAction="#stepBack"
-                        text="◀"/>
-                <Button fx:id="startIterationButton" focusTraversable="false" prefWidth="50" disable="true"
-                        onAction="#startIterations" text="▶"/>
-            </HBox>
             <ScrollPane>
                 <VBox fx:id="simplexSteps" spacing="15.0" prefHeight="340.0" prefWidth="300.0"/>
             </ScrollPane>

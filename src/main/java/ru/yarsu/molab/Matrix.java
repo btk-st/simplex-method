@@ -67,7 +67,6 @@ public class Matrix {
         return det;
     }
     public void makeDiagonal() {
-        //todo need to check minor before doing!!!
         for (int j = 0; j < rows; j++) {
             for (int i =0; i < rows; i++) {
                 //if element on main diagonal or is zero
@@ -144,5 +143,13 @@ public class Matrix {
             }
             System.out.println();
         }
+    }
+
+    public boolean zeroOnMainDiagonal() {
+        int n = matrix.length;
+        for (int i =0; i < n; i++) {
+            if (matrix[i][i].getNumerator() == 0) return true;
+        }
+        return false;
     }
 }

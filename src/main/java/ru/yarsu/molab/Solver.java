@@ -8,7 +8,8 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Solver {
-    private final int MAX_SIZE = 17;
+    //todo убрать свободный член из целевой ф-ии
+    private final int MAX_SIZE = 40;
     private int varN;
     private int constraintsN;
     private Fraction[] objF = new Fraction[MAX_SIZE];
@@ -58,7 +59,6 @@ public class Solver {
                 artificialSolver.getConstraints()[i][j] = fraction;
             }
         }
-        //todo максимальное число должно быть с учетом дополнительных переменных
         //столбец свободных членов
         for (int i = 0; i < m; i++) {
             artificialSolver.getConstraints()[i][MAX_SIZE-1] = new Fraction(constraints[i][MAX_SIZE-1]);
@@ -211,5 +211,7 @@ public class Solver {
         this.constraintsN = constraintsN;
     }
 
-
+    public int getMAX_SIZE() {
+        return MAX_SIZE;
+    }
 }

@@ -11,7 +11,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.stream.IntStream;
 
 public class LabController {
 
@@ -51,8 +50,10 @@ public class LabController {
     private ArrayList<Integer> basis = new ArrayList<Integer>();
     private File curFile = null;
     private Solver solver;
+    private Solver artificialSolver;
     private StepMatrix diagMatrix;
     private ArrayList<StepMatrix> steps = new ArrayList<StepMatrix>();
+    private ArrayList<StepMatrix> artSteps = new ArrayList<StepMatrix>();
 
     private TextField generateCell(String text, boolean editable) {
         TextField tf = new TextField();
@@ -96,7 +97,7 @@ public class LabController {
             GridPane.setColumnIndex(tf, i);
             objectiveFunction.getChildren().add(tf);
         }
-        tf = generateCell(objF[16].toString(), true);
+        tf = generateCell(objF[solver.getMAX_SIZE()-1].toString(), true);
         GridPane.setRowIndex(tf, 1);
         GridPane.setColumnIndex(tf, varN + 1);
         objectiveFunction.getChildren().add(tf);
@@ -122,7 +123,8 @@ public class LabController {
         for (int i = 1; i < varN + 1; i++) {
             tf = generateCell("a" + i, false);
             tf.setFocusTraversable(false);
-            //eventhandler to get chosen basis vars
+            //обработчик событий на клики
+            //todo не работает если сначала искусственный, потом обычный
             int finalI = i;
             tf.setOnMouseClicked(e -> {
                 TextField textField = (TextField) e.getSource();
@@ -156,7 +158,7 @@ public class LabController {
                 GridPane.setColumnIndex(tf, j);
                 table.getChildren().add(tf);
             }
-            tf = generateCell(constraints[i - 1][16].toString(), true);
+            tf = generateCell(constraints[i - 1][solver.getMAX_SIZE()-1].toString(), true);
             GridPane.setRowIndex(tf, i);
             GridPane.setColumnIndex(tf, varN + 1);
             table.getChildren().add(tf);
@@ -170,7 +172,7 @@ public class LabController {
                 String value = ((TextField) (table.getChildren().get((i + 1) * (cols + 2) + j + 1))).getText();
                 constraints[i][j] = new Fraction(value);
             }
-            constraints[i][16] = new Fraction(((TextField) (table.getChildren().get((i + 1) * (cols + 2) + cols + 1))).getText());
+            constraints[i][solver.getMAX_SIZE()-1] = new Fraction(((TextField) (table.getChildren().get((i + 1) * (cols + 2) + cols + 1))).getText());
         }
     }
 
@@ -200,14 +202,20 @@ public class LabController {
             }
         }
     }
-
+    public void clear() {
+        answer.setText("");
+        simplexSteps.getChildren().clear();
+        steps.clear();
+        artificialBasisPane.getChildren().clear();
+        artSteps.clear();
+        diagMatrix = null;
+        diagMatrixPane.getChildren().clear();
+    }
     @FXML
     private void handleNewFile() {
-        answer.setText("");
         startIterationButton.setDisable(true);
         stepBack.setDisable(true);
-        diagMatrixPane.getChildren().clear();
-        simplexSteps.getChildren().clear();
+        clear();
         solver.init();
         solver.setVarN(varNSpinner.getValue());
         solver.setConstraintsN(constraintsNSpinner.getValue());
@@ -225,9 +233,7 @@ public class LabController {
         if (file == null) return;
         stepBack.setDisable(true);
         startIterationButton.setDisable(true);
-        answer.setText("");
-        diagMatrixPane.getChildren().clear();
-        simplexSteps.getChildren().clear();
+        clear();
         curFile = file;
         fileNameLabel.setText("Текущий файл: " + file.getAbsolutePath());
         solver.readFromFile(file);
@@ -326,8 +332,9 @@ public class LabController {
     private void artificialBasis() {
         StepMatrix stepMatrix;
 
+        startIterationButton.setDisable(false);
         //конвертировали во вспомогательную задачу
-        Solver artificialSolver = solver.toSupportingTask();
+        artificialSolver = solver.toSupportingTask();
         artificialSolver.print();
 
 
@@ -356,29 +363,6 @@ public class LabController {
         diagMatrix.print();
         createDiagMatrixPane();
 
-        //из диагональной делаем первый симплекс шаг
-        StepMatrix artificialStepMatrix = diagToFirstSimplexStep(artificialSolver);
-        artificialStepMatrix.print();
-        //цикл по вспомогательным
-        //todo цикл не работает, т.к может не найтись нужных опорных эл-тов в строчке + нужно сделать с выбором как в обычном симплекс методе
-        for (int i = 0; i < artificialStepMatrix.getRows(); i++) {
-            artificialStepMatrix.findPivotElements();
-            //берем опорный элемент из i строки
-            for (PivotElement pivotElement : artificialStepMatrix.getPivotElements()) {
-                if (pivotElement.getI() == i) {
-                    //рисуем todo в другом pane
-                    createSimplexStepTable(artificialStepMatrix, true);
-                    //выбираем этот эл-т
-                    artificialStepMatrix.setSelectedPivot(pivotElement);
-                    //делаем шаг
-                    artificialStepMatrix = artificialStepMatrix.nextStepMatrix();
-                    //удаляем ненужный столбец
-                    artificialStepMatrix.deleteCol(pivotElement.getJ());
-                }
-                break;
-            }
-        }
-        createSimplexStepTable(artificialStepMatrix, true);
     }
 
     private void defaultCalc() {
@@ -402,9 +386,13 @@ public class LabController {
         }
         diagMatrix = new StepMatrix(solver.toMatrix(solver.getConstraintsN(), solver.getVarN() + 1), arr, arr1);
         //поменяем колонки (выбранные базисные - влево)
-        Collections.sort(basis);
-        for (int i = 0; i < basis.size(); i++) {
-            diagMatrix.swapColumns(i, basis.get(i));
+        //todo проблема при открытии нового файла
+        //todo НЕ РАБОТАЕТ СВАП ЕБАНЫЙ
+        System.out.println(basis);
+        for (int dest = 0; dest < basis.size(); dest++) {
+            int src = basis.get(dest);
+            for (int i = src; i > dest; i--)
+                diagMatrix.swapColumns(i, i-1);
         }
         //считаем определитель
         Fraction det = diagMatrix.getMatrix().calcDet();
@@ -414,55 +402,56 @@ public class LabController {
             stepBack.setDisable(true);
             return;
         }
+        //если на главной диагонали есть 0
+        if (diagMatrix.getMatrix().zeroOnMainDiagonal()) {
+            alert("На главной диагонали есть 0. Выберите другие базисные столбцы.");
+            startIterationButton.setDisable(true);
+            stepBack.setDisable(true);
+            return;
+        }
         System.out.println("determinant = " + det);
 
 
         //convert to diagonal view
-        //todo zero on main diagonal
         diagMatrix.getMatrix().makeDiagonal();
         System.out.println("diag matrix:");
-        diagMatrix.print();
         createDiagMatrixPane();
     }
 
     @FXML
     private void startCalc() {
-        //save data
+        //сохраняем перед вычислениями
         try {
             apply();
         } catch (IllegalArgumentException e) {
             alert("Проверьте правильность введенных данных");
             return;
         }
-        answer.setText("");
-        //delete simplex steps
-        simplexSteps.getChildren().clear();
-        steps.clear();
-        diagMatrix = null;
-        diagMatrixPane.getChildren().clear();
+        clear();
 
         //искусственный базис или обычный метод
         if (artifBasis.isSelected()) {
             artificialBasis();
         } else {
             defaultCalc();
+            //todo проверить на успешность
         }
 
         //авто-решение
         if (autoSolve.isSelected()) {
             while (steps.size() == 0 || steps.get(steps.size() - 1).getPivotElements().size() != 0) {
-                startIterations();
+                nextStep();
             }
         } else {
-            startIterations();
+            nextStep();
         }
 
     }
 
     public StepMatrix diagToFirstSimplexStep(Solver solver) {
         StepMatrix stepMatrix;
-        //fill simplex matrix from diagonal for the first time
-        //free and basis vars
+        //диагональная -> шаг симплекс метода
+        //свободные и базисные переменные
         int[] oY = Arrays.copyOf(diagMatrix.getoX(), diagMatrix.getRows());
         int[] oX = Arrays.copyOfRange(diagMatrix.getoX(), diagMatrix.getRows(), diagMatrix.getoX().length);
 
@@ -474,7 +463,7 @@ public class LabController {
             }
             simplexMatrix[i][oX.length] = diagMatrix.getMatrix().getElement(i, oX.length + oY.length);
         }
-        //fill p
+        //вычисляем p
         //calc objective function coef
         Fraction coef;
         for (int j = 0; j < oX.length; j++) {
@@ -485,11 +474,10 @@ public class LabController {
             }
             simplexMatrix[oY.length][j] = coef;
         }
-        //calc beta
-        //do the same but without multiplying by -1
+        //считаем b
+        //то же самое, без умножения на -1
         coef = new Fraction(solver.getObjF()[solver.getObjF().length - 1]);
         for (int i = 0; i < oY.length; i++) {
-            //todo beta at objective function??
             coef = coef.add(simplexMatrix[i][oX.length].multiply(solver.getObjF()[oY[i]]));
         }
         simplexMatrix[oY.length][oX.length] = coef.multiply(new Fraction(-1, 1));
@@ -499,35 +487,103 @@ public class LabController {
         return stepMatrix;
     }
 
-    public void startIterations() {
-        StepMatrix stepMatrix;
-        //if first step
-        if (steps.size() == 0) {
-            stepMatrix = diagToFirstSimplexStep(solver);
-        } else {
-            stepMatrix = steps.get(steps.size() - 1).nextStepMatrix();
+    public StepMatrix artificialToFirstSimplexStep() {
+        //берем последнюю матрицу из шагов искусственного базиса
+        StepMatrix stepMatrix = new StepMatrix(artSteps.get(artSteps.size()-1));
+        //остается только вычислить новое p
+        Fraction coef;
+        for (int j = 0; j < stepMatrix.getoX().length; j++) {
+            //coef at free var
+            coef = new Fraction(solver.getObjF()[stepMatrix.getoX()[j]]);
+            for (int i = 0; i < stepMatrix.getoY().length; i++) {
+                coef = coef.add(stepMatrix.getMatrix().getElement(i,j).multiply(new Fraction(-1, 1)).multiply(solver.getObjF()[stepMatrix.getoY()[i]]));
+            }
+            stepMatrix.getMatrix().setElement(stepMatrix.getoY().length, j, coef);
         }
-        steps.add(stepMatrix);
-        stepMatrix.findPivotElements();
-        if (stepMatrix.getPivotElements().size() == 0) {
-            startIterationButton.setDisable(true);
-            answer.setText(stepMatrix.getAnswer());
-            // end or -inf ????
+        //и b
+        coef = new Fraction(solver.getObjF()[solver.getObjF().length - 1]);
+        for (int i = 0; i < stepMatrix.getoY().length; i++) {
+            coef = coef.add(stepMatrix.getMatrix().getElement(i, stepMatrix.getoX().length).multiply(solver.getObjF()[stepMatrix.getoY()[i]]));
         }
-        stepBack.setDisable(steps.size() == 1);
-        createSimplexStepTable(stepMatrix, false);
-
+        stepMatrix.getMatrix().setElement(stepMatrix.getoY().length, stepMatrix.getoX().length, coef.multiply(new Fraction(-1, 1)));
+        return stepMatrix;
     }
+    public void nextStep() {
+        //если искусственный И не завершили искусственный базис
+        if (artifBasis.isSelected() && steps.size() == 0) {
+            //если шагов было сделано достаточно для свапа переменных, то переходим к симплекс методу
+            if (artSteps.size() == artificialSolver.getConstraintsN()+1) {
+                StepMatrix firstSimplexStep = artificialToFirstSimplexStep();
 
+                steps.add(firstSimplexStep);
+                firstSimplexStep.findPivotElements();
+                if (firstSimplexStep.getPivotElements().size() == 0) {
+                    startIterationButton.setDisable(true);
+                    answer.setText(firstSimplexStep.getAnswer());
+                    // end or -inf ????
+                }
+                createSimplexStepTable(firstSimplexStep, false);
+            } else {
+                StepMatrix artificialStepMatrix;
+                //все еще решаем искусственный
+                if (artSteps.size() == 0) {
+                    //из диагональной делаем первый симплекс шаг
+                    artificialStepMatrix = diagToFirstSimplexStep(artificialSolver);
+                    artificialStepMatrix.print();
+                } else {
+                    //очередной шаг
+                    //todo из каждой строчки по одному разу!!!
+                    PivotElement selectedPivot = artSteps.get(artSteps.size() - 1).getSelectedPivot();
+                    artificialStepMatrix = artSteps.get(artSteps.size() - 1).nextStepMatrix();
+                    //удаляем ненужный столбец
+                    artificialStepMatrix.deleteCol(selectedPivot.getJ());
+                }
+                artSteps.add(artificialStepMatrix);
+                artificialStepMatrix.findPivotElements();
+                stepBack.setDisable(artSteps.size() == 1);
+                createSimplexStepTable(artificialStepMatrix, true);
+            }
+        }
+        else {
+            StepMatrix stepMatrix;
+
+            if (steps.size() == 0) {
+                stepMatrix = diagToFirstSimplexStep(solver);
+            } else {
+                stepMatrix = steps.get(steps.size() - 1).nextStepMatrix();
+            }
+            steps.add(stepMatrix);
+            stepMatrix.findPivotElements();
+            if (stepMatrix.getPivotElements().size() == 0) {
+                startIterationButton.setDisable(true);
+                answer.setText(stepMatrix.getAnswer());
+                // end or -inf ????
+            }
+            stepBack.setDisable(steps.size() == 1 && !artifBasis.isSelected());
+            createSimplexStepTable(stepMatrix, false);
+        }
+    }
     @FXML
     private void stepBack() {
-        answer.setText("");
-        int stepToRemove = steps.size() - 1;
-        steps.remove(stepToRemove);
-        simplexSteps.getChildren().remove(stepToRemove);
-        startIterationButton.setDisable(false);
-        //if first step
-        stepBack.setDisable(steps.size() == 1);
+        //если решаем с искусственным базисом И в шагах симплекса пусто
+        if (steps.size() == 0 && artifBasis.isSelected()) {
+            int stepToRemove = artSteps.size() - 1;
+            artSteps.remove(stepToRemove);
+            artificialBasisPane.getChildren().remove(stepToRemove);
+            startIterationButton.setDisable(false);
+            //если первый шаг
+            stepBack.setDisable(artSteps.size() == 1);
+        } else if (steps.size() > 0) {
+            answer.setText("");
+            int stepToRemove = steps.size() - 1;
+            steps.remove(stepToRemove);
+            simplexSteps.getChildren().remove(stepToRemove);
+            startIterationButton.setDisable(false);
+            //если не искусственный И на первом шаге
+            stepBack.setDisable(steps.size() == 1 && !artifBasis.isSelected());
+        }
+
+
     }
 
     private void createSimplexStepTable(StepMatrix stepMatrix, boolean artificialBasisStep) {
@@ -572,35 +628,34 @@ public class LabController {
             }
         }
 
-        //highlight pivot elements
-        if (!artificialBasisStep) {
-            int startIndex = stepMatrix.getCols() + stepMatrix.getRows() + 3;
-            for (PivotElement el : stepMatrix.getPivotElements()) {
-                int index = el.getI() * (stepMatrix.getCols() + 1) + el.getJ();
-                tf = (TextField) stepPane.getChildren().get(startIndex + index);
-                if (el.isBest()) {
-                    tf.setStyle("-fx-border-color:red;-fx-control-inner-background:#2494c4;");
-                    stepMatrix.setSelectedPivot(el);
-                } else
-                    tf.setStyle("-fx-border-color:#27e827;");
-                //what to do when choosing pivot el
-                final int curStep = steps.size();
-                tf.setOnMouseClicked(e -> {
-                    //block selection if it is not our current step
-                    if (steps.size() != curStep) return;
-                    //old el
-                    PivotElement oldPivotElement = stepMatrix.getSelectedPivot();
-                    if (oldPivotElement != null) {
-                        TextField textField = (TextField) stepPane.getChildren().get(startIndex + oldPivotElement.getI() * (stepMatrix.getCols() + 1) + oldPivotElement.getJ());
-                        textField.setStyle(textField.getStyle() + "-fx-control-inner-background:white;");
-                    }
-                    //new
-                    TextField textField = (TextField) e.getSource();
-                    stepMatrix.setSelectedPivot(el);
-                    System.out.println(stepMatrix.getSelectedPivot().getI() + " " + stepMatrix.getSelectedPivot().getJ());
-                    textField.setStyle(textField.getStyle() + "-fx-control-inner-background:#2494c4;");
-                });
-            }
+        //подсветка опорных элементов
+        int startIndex = stepMatrix.getCols() + stepMatrix.getRows() + 3;
+        for (PivotElement el : stepMatrix.getPivotElements()) {
+            int index = el.getI() * (stepMatrix.getCols() + 1) + el.getJ();
+            tf = (TextField) stepPane.getChildren().get(startIndex + index);
+            if (el.isBest()) {
+                tf.setStyle("-fx-border-color:red;-fx-control-inner-background:#2494c4;");
+                stepMatrix.setSelectedPivot(el);
+            } else
+                tf.setStyle("-fx-border-color:#27e827;");
+            //текущий шаг
+            final int curStep = (artificialBasisStep ? artSteps.size() : steps.size());
+            //обработка клика
+            tf.setOnMouseClicked(e -> {
+                //если не текущий шаг, то не даем возможность выбора
+                if ((artificialBasisStep ? artSteps : steps).size() != curStep) return;
+
+                PivotElement oldPivotElement = stepMatrix.getSelectedPivot();
+                if (oldPivotElement != null) {
+                    TextField textField = (TextField) stepPane.getChildren().get(startIndex + oldPivotElement.getI() * (stepMatrix.getCols() + 1) + oldPivotElement.getJ());
+                    textField.setStyle(textField.getStyle() + "-fx-control-inner-background:white;");
+                }
+
+                TextField textField = (TextField) e.getSource();
+                stepMatrix.setSelectedPivot(el);
+                System.out.println(stepMatrix.getSelectedPivot().getI() + " " + stepMatrix.getSelectedPivot().getJ());
+                textField.setStyle(textField.getStyle() + "-fx-control-inner-background:#2494c4;");
+            });
         }
 
         if (artificialBasisStep) artificialBasisPane.getChildren().add(stepPane);
