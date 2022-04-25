@@ -54,6 +54,7 @@ public class LabController {
     private StepMatrix diagMatrix;
     private ArrayList<StepMatrix> steps = new ArrayList<StepMatrix>();
     private ArrayList<StepMatrix> artSteps = new ArrayList<StepMatrix>();
+    private ArrayList<Integer> usedRows = new ArrayList<>();
 
     private TextField generateCell(String text, boolean editable) {
         TextField tf = new TextField();
@@ -389,7 +390,7 @@ public class LabController {
         diagMatrix = new StepMatrix(solver.toMatrix(solver.getConstraintsN(), solver.getVarN() + 1), arr, arr1);
         //поменяем колонки (выбранные базисные - влево)
         //todo вроде работает
-
+        //todo добавить перебор, если не выбраны базисные
         //tmp базис чтобы не портить основной
         ArrayList<Integer> curBasis = new ArrayList<>(basis);
         for (int i = 0; i < basis.size(); i++) {
@@ -536,17 +537,29 @@ public class LabController {
                 if (artSteps.size() == 0) {
                     //из диагональной делаем первый симплекс шаг
                     artificialStepMatrix = diagToFirstSimplexStep(artificialSolver);
-                    artificialStepMatrix.print();
+                    //ищем опорные
+                    artificialStepMatrix.findPivotElements();
                 } else {
+
                     //очередной шаг
-                    //todo из каждой строчки по одному разу!!!
                     PivotElement selectedPivot = artSteps.get(artSteps.size() - 1).getSelectedPivot();
+                    //добавляем в занятые строки
+                    usedRows.add(selectedPivot.getI());
+                    //получаем следующую матрицу
                     artificialStepMatrix = artSteps.get(artSteps.size() - 1).nextStepMatrix();
                     //удаляем ненужный столбец
                     artificialStepMatrix.deleteCol(selectedPivot.getJ());
+                    //ищем в ней опорные
+                    artificialStepMatrix.findPivotElements();
+                    //todo работает, но надо проверить для строк > 2
+                    //удаляем в ней опорные элементы в строках, которые уже были использованы
+                    for (int i:usedRows) {
+                        artificialStepMatrix.deletePivotsByRow(i);
+                    }
+                    //находим новый лучший опорный эл-т
+                    artificialStepMatrix.findBestPivot();
                 }
                 artSteps.add(artificialStepMatrix);
-                artificialStepMatrix.findPivotElements();
                 stepBack.setDisable(artSteps.size() == 1);
                 createSimplexStepTable(artificialStepMatrix, true);
             }
@@ -594,6 +607,8 @@ public class LabController {
     }
 
     private void createSimplexStepTable(StepMatrix stepMatrix, boolean artificialBasisStep) {
+        //чистим занятые строки если первый шаг искусственного базиса
+        usedRows.clear();
         GridPane stepPane = new GridPane();
 
         TextField tf;

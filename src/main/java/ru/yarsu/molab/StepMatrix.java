@@ -143,6 +143,12 @@ public class StepMatrix {
 
         }
         //находим лучший (минимальное значение)
+        findBestPivot();
+    }
+    public void deletePivotsByRow(int i) {
+        pivotElements.removeIf(cur -> cur.getI() == i);
+    }
+    public void findBestPivot() {
         PivotElement min = null;
         for (PivotElement cur : pivotElements) {
             if (min == null) {
@@ -155,14 +161,15 @@ public class StepMatrix {
         }
         if (min == null) {
             System.out.println("pivot element not found??");
+        } else {
+            min.setBest(true);
         }
-        min.setBest(true);
-        return;
     }
     public String getAnswer() {
         return answer;
     }
     public StepMatrix nextStepMatrix() {
+        System.out.println("шаг симплекса:");
         matrix.print();
         StepMatrix newMatrix = new StepMatrix(this);
         //1:индексы

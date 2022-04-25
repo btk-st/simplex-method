@@ -36,14 +36,14 @@
     </top>
     <left>
         <VBox alignment="TOP_LEFT" prefHeight="520.0" prefWidth="142.0" spacing="10.0" BorderPane.alignment="CENTER">
-            <Label text="число переменных"/>
+            <Label text="Число переменных"/>
             <Spinner fx:id="varNSpinner" editable="true" prefHeight="25.0" prefWidth="114.0">
                 <valueFactory>
                     <SpinnerValueFactory.IntegerSpinnerValueFactory max="16" min="1"/>
                 </valueFactory>
             </Spinner>
 
-            <Label text="число ограничений"/>
+            <Label text="Число ограничений"/>
             <Spinner fx:id="constraintsNSpinner" editable="true" prefHeight="25.0" prefWidth="113.0">
                 <valueFactory>
                     <SpinnerValueFactory.IntegerSpinnerValueFactory max="16" min="1"/>
