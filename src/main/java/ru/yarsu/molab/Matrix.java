@@ -10,7 +10,7 @@ public class Matrix {
         this.cols = cols;
         this.matrix = new Fraction[rows][cols];
 
-        //copy fractions
+        //копируем значения
         for (int i =0; i < rows; i++)
             for (int j =0; j < cols; j++)
                 this.matrix[i][j] = new Fraction(matrix[i][j]);
@@ -56,7 +56,7 @@ public class Matrix {
         return det;
     }
     public Fraction calcDet() {
-        //n is row count
+        //n - число строк
         int n = matrix.length;
         Fraction det = new Fraction(0,1);
         if (n == 1) return matrix[0][0];
@@ -69,7 +69,7 @@ public class Matrix {
     public void makeDiagonal() {
         for (int j = 0; j < rows; j++) {
             for (int i =0; i < rows; i++) {
-                //if element on main diagonal or is zero
+                //элемент на главной диагонали ИЛИ равен 0
                 if (i == j || matrix[i][j].getNumerator() == 0) continue;
                 Fraction multiplier = matrix[i][j].divide(matrix[j][j]);
                 Fraction[] rowToSubtract =  this.rowCopy(j);
@@ -77,7 +77,7 @@ public class Matrix {
                 this.multiplyRow(rowToSubtract, new Fraction(-1,1));
                 this.addRow(this.getRow(i), rowToSubtract);
             }
-            //divide origin row to get coef 1
+            //делим строку, чтобы получить 1
             this.multiplyRow(this.getRow(j), new Fraction(1,1).divide(matrix[j][j]));
         }
     }

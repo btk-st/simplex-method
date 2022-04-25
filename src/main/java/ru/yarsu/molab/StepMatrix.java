@@ -69,7 +69,7 @@ public class StepMatrix {
         for (int j : oY) System.out.println(j);
     }
     public void findPivotElements() {
-        //1) for all i>0: p(i) >= 0 then answer
+        //1) для всех i > 0: p(i) >= 0 тогда ответ
         int pRow = rows;
         Fraction zero = new Fraction(0,1);
         boolean isAnswer = true;
@@ -95,7 +95,7 @@ public class StepMatrix {
             return;
         }
 
-        //2) if exists pi < 0 AND for all i ai <= 0 then no answer
+        //2) если сущ. pi < 0 И для всех i ai <= 0 тогда неограничена снизу
         boolean isNoAnswer;
         for (int j = 0; j < cols; j ++) {
             if (matrix.getElement(pRow, j).compare(zero) == -1) {
@@ -114,7 +114,7 @@ public class StepMatrix {
             }
         }
 
-        //3) if not 1) and 2) then continue process -
+        //3) продолжаем, если не 1) и не 2)if not 1) and 2)
         PivotElement colCandidate;
         for (int j = 0; j < cols; j++) {
             colCandidate = null;
@@ -124,11 +124,11 @@ public class StepMatrix {
                     if (curEl.compare(zero) == 0) continue;
                     Fraction curValue = matrix.getElement(i,cols).divide(curEl);
                     if (curEl.compare(zero) < 1) continue;
-                    //if element is first
+                    //если до этого не было эл-тов
                     if (colCandidate == null) {
                         colCandidate = new PivotElement(i,j, curValue);
                     } else {
-                        //new best column element
+                        //новое лучшее значение
                         if (curValue.compare(colCandidate.getValue()) == -1) {
                             colCandidate.setI(i);
                             colCandidate.setJ(j);
@@ -142,7 +142,7 @@ public class StepMatrix {
             }
 
         }
-        //find best (min value)
+        //находим лучший (минимальное значение)
         PivotElement min = null;
         for (PivotElement cur : pivotElements) {
             if (min == null) {
@@ -165,29 +165,28 @@ public class StepMatrix {
     public StepMatrix nextStepMatrix() {
         matrix.print();
         StepMatrix newMatrix = new StepMatrix(this);
-        //1:indexes
+        //1:индексы
         int r = selectedPivot.getI();
         int s = selectedPivot.getJ();
-        //switch r and s
+        //меняем r и s
         int tmp = newMatrix.getoX()[s];
         newMatrix.getoX()[s] = newMatrix.getoY()[r];
         newMatrix.getoY()[r] = tmp;
-        //doing transition
+        //переход
         //2
         Fraction newPivotEl = new Fraction(1,1).divide(matrix.getElement(r,s));
         newMatrix.getMatrix().setElement(r,s, newPivotEl);
-        //3: row
+        //3: строка
         for (int j = 0; j < cols+1; j++) {
             if (j==s) continue;
             newMatrix.getMatrix().setElement(r, j, matrix.getElement(r,j).multiply(newPivotEl));
         }
-        //4: col
+        //4: столбец
         for (int i = 0; i < rows+1; i++) {
             if (i==r) continue;
             newMatrix.getMatrix().setElement(i, s, matrix.getElement(i,s).multiply(newPivotEl).multiply(new Fraction(-1,1)));
         }
-        //5: rest
-        matrix.print();
+        //5: остальное
         for (int i = 0; i < rows+1; i++) {
             if (i == r) continue;
             for (int j = 0; j < cols+1; j++) {

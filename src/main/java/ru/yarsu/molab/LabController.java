@@ -124,7 +124,6 @@ public class LabController {
             tf = generateCell("a" + i, false);
             tf.setFocusTraversable(false);
             //обработчик событий на клики
-            //todo не работает если сначала искусственный, потом обычный
             int finalI = i;
             tf.setOnMouseClicked(e -> {
                 TextField textField = (TextField) e.getSource();
@@ -351,27 +350,30 @@ public class LabController {
         diagMatrix = new StepMatrix(artificialSolver.toMatrix(artificialSolver.getConstraintsN(), artificialSolver.getVarN() + 1), arr, arr1);
 
         //поменяем колонки (n+1..m - влево)
-        basis.clear();
+        //tmp базис чтобы не портить основной
+        ArrayList<Integer> curBasis = new ArrayList<>();
         for (int i = artificialSolver.getVarN() - artificialSolver.getConstraintsN(); i < artificialSolver.getVarN(); i++)
-            basis.add(i);
-        for (int dest = 0; dest < basis.size(); dest++) {
-            int src = basis.get(dest);
+            curBasis.add(i);
+        for (int dest = 0; dest < curBasis.size(); dest++) {
+            int src = curBasis.get(dest);
             for (int i = src; i > dest; i--)
                 diagMatrix.swapColumns(i, i-1);
         }
+
         //так как уже приведена к диагональному, дальнейшие действия не требуются
         diagMatrix.print();
         createDiagMatrixPane();
 
     }
 
-    private void defaultCalc() {
+    private boolean defaultCalc() {
+        System.out.println(basis);
         //пользователь выбрал базисные переменные самостоятельно
         if (basis.size() != solver.getConstraintsN()) {
             stepBack.setDisable(true);
             startIterationButton.setDisable(true);
             alert("Выбрано недостаточно базисных переменных");
-            return;
+            return false;
         }
         startIterationButton.setDisable(false);
 
@@ -386,13 +388,18 @@ public class LabController {
         }
         diagMatrix = new StepMatrix(solver.toMatrix(solver.getConstraintsN(), solver.getVarN() + 1), arr, arr1);
         //поменяем колонки (выбранные базисные - влево)
-        //todo проблема при открытии нового файла
-        //todo НЕ РАБОТАЕТ СВАП ЕБАНЫЙ
-        System.out.println(basis);
-        for (int dest = 0; dest < basis.size(); dest++) {
-            int src = basis.get(dest);
-            for (int i = src; i > dest; i--)
-                diagMatrix.swapColumns(i, i-1);
+        //todo вроде работает
+
+        //tmp базис чтобы не портить основной
+        ArrayList<Integer> curBasis = new ArrayList<>(basis);
+        for (int i = 0; i < basis.size(); i++) {
+            if (i == basis.get(i)) continue;
+            diagMatrix.swapColumns(i, curBasis.get(i));
+            if (curBasis.contains(i)) {
+                int old = curBasis.get(i);
+                curBasis.remove(Integer.valueOf(i));
+                curBasis.add(old);
+            }
         }
         //считаем определитель
         Fraction det = diagMatrix.getMatrix().calcDet();
@@ -400,22 +407,23 @@ public class LabController {
             alert("Определитель матрицы по выбранным базисным столбцам = 0");
             startIterationButton.setDisable(true);
             stepBack.setDisable(true);
-            return;
+            return false;
         }
         //если на главной диагонали есть 0
         if (diagMatrix.getMatrix().zeroOnMainDiagonal()) {
             alert("На главной диагонали есть 0. Выберите другие базисные столбцы.");
             startIterationButton.setDisable(true);
             stepBack.setDisable(true);
-            return;
+            return false;
         }
         System.out.println("determinant = " + det);
 
 
-        //convert to diagonal view
+        //приводим в диагональный вид
         diagMatrix.getMatrix().makeDiagonal();
         System.out.println("diag matrix:");
         createDiagMatrixPane();
+        return true;
     }
 
     @FXML
@@ -433,8 +441,7 @@ public class LabController {
         if (artifBasis.isSelected()) {
             artificialBasis();
         } else {
-            defaultCalc();
-            //todo проверить на успешность
+            if (!defaultCalc()) return;
         }
 
         //авто-решение
@@ -464,7 +471,7 @@ public class LabController {
             simplexMatrix[i][oX.length] = diagMatrix.getMatrix().getElement(i, oX.length + oY.length);
         }
         //вычисляем p
-        //calc objective function coef
+        //считаем коеф у целевой ф-ии
         Fraction coef;
         for (int j = 0; j < oX.length; j++) {
             //coef at free var
@@ -554,10 +561,10 @@ public class LabController {
             }
             steps.add(stepMatrix);
             stepMatrix.findPivotElements();
+            //нашли ответ
             if (stepMatrix.getPivotElements().size() == 0) {
                 startIterationButton.setDisable(true);
                 answer.setText(stepMatrix.getAnswer());
-                // end or -inf ????
             }
             stepBack.setDisable(steps.size() == 1 && !artifBasis.isSelected());
             createSimplexStepTable(stepMatrix, false);
