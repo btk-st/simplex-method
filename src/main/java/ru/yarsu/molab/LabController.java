@@ -3,6 +3,8 @@ package ru.yarsu.molab;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -281,6 +283,15 @@ public class LabController {
 
     @FXML
     private void handleAuthor() {
+        Image cat = new Image(new File("src/main/resources/ru/yarsu/molab/kuritsa.gif").toURI().toString());
+        ImageView imageView = new ImageView(cat);
+        imageView.setStyle( "-fx-alignment: BOTTOM;");
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setGraphic(imageView);
+        alert.setTitle("");
+        alert.setHeaderText("Волков Андрей ИВТ32БО");
+        alert.setContentText(null);
+        alert.showAndWait();
     }
 
     @FXML
@@ -376,7 +387,7 @@ public class LabController {
         if (basis.size() != solver.getConstraintsN()) {
             stepBack.setDisable(true);
             startIterationButton.setDisable(true);
-            alert("Выбрано недостаточно базисных переменных");
+            alert("Выбрано недостаточно базисных переменных.\nВыбор осуществляется кликом на a1,a2...\nПорядок выбора имеет значение");
             return false;
         }
         startIterationButton.setDisable(false);
