@@ -60,7 +60,7 @@ public class Matrix {
         int n = matrix.length;
         Fraction det = new Fraction(0,1);
         if (n == 1) return matrix[0][0];
-        //todo find best row/col
+        //вычисляем по первой строке
         for (int j = 0; j < n; j++) {
             det = det.add(matrix[0][j].multiply(cofactor(0, j)));
         }

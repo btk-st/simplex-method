@@ -85,6 +85,7 @@ public class LabController {
         GridPane.setRowIndex(tf, 0);
         GridPane.setColumnIndex(tf, varN + 1);
         objectiveFunction.getChildren().add(tf);
+        tf.setVisible(false);
 
         tf = generateCell("f(x)", false);
         tf.setFocusTraversable(false);
@@ -102,6 +103,7 @@ public class LabController {
         GridPane.setRowIndex(tf, 1);
         GridPane.setColumnIndex(tf, varN + 1);
         objectiveFunction.getChildren().add(tf);
+        tf.setVisible(false);
     }
 
     private void saveObjFTable(int cols) throws IllegalArgumentException {
@@ -210,6 +212,7 @@ public class LabController {
         artSteps.clear();
         diagMatrix = null;
         diagMatrixPane.getChildren().clear();
+        usedRows.clear();
     }
     @FXML
     private void handleNewFile() {
@@ -389,8 +392,6 @@ public class LabController {
         }
         diagMatrix = new StepMatrix(solver.toMatrix(solver.getConstraintsN(), solver.getVarN() + 1), arr, arr1);
         //поменяем колонки (выбранные базисные - влево)
-        //todo вроде работает
-        //todo добавить перебор, если не выбраны базисные
         //tmp базис чтобы не портить основной
         ArrayList<Integer> curBasis = new ArrayList<>(basis);
         for (int i = 0; i < basis.size(); i++) {
@@ -412,7 +413,7 @@ public class LabController {
         }
         //если на главной диагонали есть 0
         if (diagMatrix.getMatrix().zeroOnMainDiagonal()) {
-            alert("На главной диагонали есть 0. Выберите другие базисные столбцы.");
+            alert("На главной диагонали есть 0. Выберите другие базисные столбцы/их порядок.");
             startIterationButton.setDisable(true);
             stepBack.setDisable(true);
             return false;
@@ -508,6 +509,7 @@ public class LabController {
             }
             stepMatrix.getMatrix().setElement(stepMatrix.getoY().length, j, coef);
         }
+        //todo контроль отрицательных b - такого быть не должно (10 пример, искусственный базис)
         //и b
         coef = new Fraction(solver.getObjF()[solver.getObjF().length - 1]);
         for (int i = 0; i < stepMatrix.getoY().length; i++) {
@@ -540,18 +542,17 @@ public class LabController {
                     //ищем опорные
                     artificialStepMatrix.findPivotElements();
                 } else {
-
                     //очередной шаг
                     PivotElement selectedPivot = artSteps.get(artSteps.size() - 1).getSelectedPivot();
                     //добавляем в занятые строки
                     usedRows.add(selectedPivot.getI());
+                    System.out.println("cur used rows" + usedRows);
                     //получаем следующую матрицу
                     artificialStepMatrix = artSteps.get(artSteps.size() - 1).nextStepMatrix();
                     //удаляем ненужный столбец
                     artificialStepMatrix.deleteCol(selectedPivot.getJ());
                     //ищем в ней опорные
                     artificialStepMatrix.findPivotElements();
-                    //todo работает, но надо проверить для строк > 2
                     //удаляем в ней опорные элементы в строках, которые уже были использованы
                     for (int i:usedRows) {
                         artificialStepMatrix.deletePivotsByRow(i);
@@ -593,6 +594,9 @@ public class LabController {
             startIterationButton.setDisable(false);
             //если первый шаг
             stepBack.setDisable(artSteps.size() == 1);
+            //удаляем последний элемент из usedRows т.к. строка освободилась
+            usedRows.remove(usedRows.size()-1);
+            System.out.println("cur used rows" + usedRows);
         } else if (steps.size() > 0) {
             answer.setText("");
             int stepToRemove = steps.size() - 1;
@@ -608,7 +612,9 @@ public class LabController {
 
     private void createSimplexStepTable(StepMatrix stepMatrix, boolean artificialBasisStep) {
         //чистим занятые строки если первый шаг искусственного базиса
-        usedRows.clear();
+        if (artificialBasisStep && artSteps.size() == 1) {
+            usedRows.clear();
+        }
         GridPane stepPane = new GridPane();
 
         TextField tf;

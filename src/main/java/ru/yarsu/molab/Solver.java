@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Solver {
-    //todo убрать свободный член из целевой ф-ии
     private final int MAX_SIZE = 40;
     private int varN;
     private int constraintsN;

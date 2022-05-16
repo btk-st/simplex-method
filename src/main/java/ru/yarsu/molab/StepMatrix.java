@@ -91,7 +91,7 @@ public class StepMatrix {
                 answer += ", " + xs[i].toString();
             }
             answer += ")";
-            answer += "\nf = " + matrix.getElement(pRow, cols).multiply(new Fraction(-1, 1));
+            answer += "  f = " + matrix.getElement(pRow, cols).multiply(new Fraction(-1, 1));
             return;
         }
 
@@ -114,7 +114,7 @@ public class StepMatrix {
             }
         }
 
-        //3) продолжаем, если не 1) и не 2)if not 1) and 2)
+        //3) продолжаем, если не 1) и не 2)
         PivotElement colCandidate;
         for (int j = 0; j < cols; j++) {
             colCandidate = null;
