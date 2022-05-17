@@ -7,7 +7,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
+import javafx.scene.media.Media;
+import javafx.util.Duration;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -283,15 +286,30 @@ public class LabController {
 
     @FXML
     private void handleAuthor() {
-        Image cat = new Image(new File("src/main/resources/ru/yarsu/molab/kuritsa.gif").toURI().toString());
+        Image cat = new Image(new File("src/main/resources/ru/yarsu/molab/Zxcursed.gif").toURI().toString());
         ImageView imageView = new ImageView(cat);
         imageView.setStyle( "-fx-alignment: BOTTOM;");
+        Media pick = new Media(new File("src/main/resources/ru/yarsu/molab/galileo.mp3").toURI().toString());
+        MediaPlayer player = new MediaPlayer(pick);
+        player.setOnEndOfMedia(() -> {
+            player.seek(Duration.ZERO);
+            player.play();
+        });
+        player.play();
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setGraphic(imageView);
+        alert.getDialogPane().getChildren().get(0).setStyle("-fx-background-color: #fcfcff;");
+        alert.getDialogPane().getChildren().get(1).setStyle("-fx-background-color: #fcfcff; -fx-font-size: 30");
+        alert.getDialogPane().getChildren().get(2).setStyle("-fx-background-color: #fcfcff;");
+//        alert.getDialogPane().getChildren().get(0).setStyle("-fx-background-color: white;");
+//        alert.getDialogPane().getChildren().get(1).setStyle("-fx-background-color: white; -fx-font-size: 30");
+//        alert.getDialogPane().getChildren().get(2).setStyle("-fx-background-color: white;");
+
         alert.setTitle("");
-        alert.setHeaderText("Волков Андрей ИВТ32БО");
-        alert.setContentText(null);
+        alert.setHeaderText(null);
+        alert.setContentText("Волков Андрей ИВТ32БО");
         alert.showAndWait();
+        player.stop();
     }
 
     @FXML
