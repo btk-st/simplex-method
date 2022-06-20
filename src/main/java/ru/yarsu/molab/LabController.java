@@ -286,11 +286,12 @@ public class LabController {
 
     @FXML
     private void handleAuthor() {
-        Image cat = new Image(new File("src/main/resources/ru/yarsu/molab/Zxcursed.gif").toURI().toString());
+        Image cat = new Image(new File("src/main/resources/ru/yarsu/molab/enot.gif").toURI().toString());
         ImageView imageView = new ImageView(cat);
         imageView.setStyle( "-fx-alignment: BOTTOM;");
-        Media pick = new Media(new File("src/main/resources/ru/yarsu/molab/galileo.mp3").toURI().toString());
+        Media pick = new Media(new File("src/main/resources/ru/yarsu/molab/dlyaenota.mp3").toURI().toString());
         MediaPlayer player = new MediaPlayer(pick);
+        player.setVolume(0.2);
         player.setOnEndOfMedia(() -> {
             player.seek(Duration.ZERO);
             player.play();
@@ -538,7 +539,6 @@ public class LabController {
             }
             stepMatrix.getMatrix().setElement(stepMatrix.getoY().length, j, coef);
         }
-        //todo контроль отрицательных b - такого быть не должно (10 пример, искусственный базис)
         //и b
         coef = new Fraction(solver.getObjF()[solver.getObjF().length - 1]);
         for (int i = 0; i < stepMatrix.getoY().length; i++) {

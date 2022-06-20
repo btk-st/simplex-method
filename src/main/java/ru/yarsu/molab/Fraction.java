@@ -90,7 +90,12 @@ public class Fraction {
             return -1;
         return 1;
     }
-
+    public static int compareToZero(Fraction fraction) {
+        if (fraction.getNumerator() == 0) return 0;
+        if (fraction.getNumerator() < 0 && fraction.getDenominator() > 0 || fraction.getNumerator() > 0 && fraction.getDenominator() < 0)
+            return -1;
+        return 1;
+    }
     /**
      * Reduce the fraction to lowest form
      */

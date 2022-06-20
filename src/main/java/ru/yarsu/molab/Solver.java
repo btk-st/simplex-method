@@ -46,8 +46,14 @@ public class Solver {
         //ограничения
         //скопируем значения из оригинальной задачи
         for (int i = 0; i <m; i++) {
+            //если bi < 0, то умножим строку на -1
+            Fraction bi = constraints[i][MAX_SIZE-1];
+            //умножаем на 1 или -1
+            Fraction multiplier = new Fraction(((Fraction.compareToZero(bi) == -1) ? -1 : 1), 1);
+            System.out.println(multiplier);
+            artificialSolver.getConstraints()[i][MAX_SIZE-1] = new Fraction(bi.multiply(multiplier));
             for (int j = 0; j < n; j ++) {
-                artificialSolver.getConstraints()[i][j] = new Fraction(constraints[i][j]);
+                artificialSolver.getConstraints()[i][j] = new Fraction(constraints[i][j].multiply(multiplier));
             }
         }
         //1 0 0.. 0 1 0.. 0 0 1 для вспомогательных
@@ -57,10 +63,6 @@ public class Solver {
                 fraction = (j-n == i) ? new Fraction(1,1) : new Fraction(0,1);
                 artificialSolver.getConstraints()[i][j] = fraction;
             }
-        }
-        //столбец свободных членов
-        for (int i = 0; i < m; i++) {
-            artificialSolver.getConstraints()[i][MAX_SIZE-1] = new Fraction(constraints[i][MAX_SIZE-1]);
         }
         return artificialSolver;
     }
