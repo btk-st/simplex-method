@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
@@ -12,92 +13,90 @@
 <?import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.chart.BarChart?>
-<?import javafx.scene.control.CheckBox?>
-<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="ru.yarsu.molab.LabController">
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.yarsu.molab.LabController">
     <top>
         <MenuBar fx:id="menuBar" minWidth="200" BorderPane.alignment="CENTER">
             <Menu text="Файл">
-                <MenuItem onAction="#handleNewFile" text="Новый файл"/>
-                <MenuItem onAction="#handleFileOpen" text="Открыть"/>
-                <MenuItem onAction="#handleFileSave" text="Сохранить"/>
-                <MenuItem onAction="#handleFileSaveAs" text="Сохранить как"/>
+                <MenuItem onAction="#handleNewFile" text="Новый файл" />
+                <MenuItem onAction="#handleFileOpen" text="Открыть" />
+                <MenuItem onAction="#handleFileSave" text="Сохранить" />
+                <MenuItem onAction="#handleFileSaveAs" text="Сохранить как" />
             </Menu>
             <Menu text="О программе">
-                <MenuItem onAction="#handleAuthor" text="Автор"/>
-                <SeparatorMenuItem/>
-                <MenuItem onAction="#handleHelp" text="Помощь"/>
+                <MenuItem onAction="#handleAuthor" text="Автор" />
+                <SeparatorMenuItem />
+                <MenuItem onAction="#handleHelp" text="Помощь" />
             </Menu>
         </MenuBar>
     </top>
     <left>
-        <VBox alignment="TOP_LEFT" prefHeight="520.0" prefWidth="142.0" spacing="10.0" BorderPane.alignment="CENTER">
-            <Label text="Число переменных"/>
+        <VBox alignment="TOP_LEFT" prefHeight="646.0" prefWidth="200.0" spacing="10.0" BorderPane.alignment="CENTER">
+            <Label text="Число переменных" />
             <Spinner fx:id="varNSpinner" editable="true" prefHeight="25.0" prefWidth="114.0">
                 <valueFactory>
-                    <SpinnerValueFactory.IntegerSpinnerValueFactory max="16" min="1"/>
+                    <SpinnerValueFactory.IntegerSpinnerValueFactory max="16" min="1" />
                 </valueFactory>
             </Spinner>
 
-            <Label text="Число ограничений"/>
+            <Label text="Число ограничений" />
             <Spinner fx:id="constraintsNSpinner" editable="true" prefHeight="25.0" prefWidth="113.0">
                 <valueFactory>
-                    <SpinnerValueFactory.IntegerSpinnerValueFactory max="16" min="1"/>
+                    <SpinnerValueFactory.IntegerSpinnerValueFactory max="16" min="1" />
                 </valueFactory>
             </Spinner>
-            <Button fx:id="solve" mnemonicParsing="false" onAction="#startCalc" text="Начать"/>
+            <Button fx:id="solve" mnemonicParsing="false" onAction="#startCalc" text="Начать" />
             <HBox>
-                <Label text="Решать автоматически?"/>
-                <CheckBox fx:id="autoSolve" selected="false"/>
+                <Label text="Решать автоматически?  " />
+                <CheckBox fx:id="autoSolve" selected="false" />
             </HBox>
             <HBox>
-                <Label text="Использовать искусственный базис?"/>
-                <CheckBox fx:id="artifBasis" selected="false"/>
+                <VBox>
+                    <Label text="Использовать искусственный " />
+                    <Label text="базис? " />
+                </VBox>
+                <CheckBox fx:id="artifBasis" selected="false" />
             </HBox>
             <HBox>
-                <Button fx:id="stepBack" focusTraversable="false" prefWidth="50" disable="true" onAction="#stepBack"
-                        text="◀"/>
-                <Button fx:id="startIterationButton" focusTraversable="false" prefWidth="50" disable="true"
-                        onAction="#nextStep" text="▶"/>
+                <Button fx:id="stepBack" disable="true" focusTraversable="false" onAction="#stepBack" prefWidth="50" text="◀" />
+                <Button fx:id="startIterationButton" disable="true" focusTraversable="false" onAction="#nextStep" prefWidth="50" text="▶" />
             </HBox>
             <opaqueInsets>
-                <Insets/>
+                <Insets />
             </opaqueInsets>
             <padding>
-                <Insets left="10.0" top="10.0"/>
+                <Insets left="10.0" top="10.0" />
             </padding>
         </VBox>
     </left>
 
     <bottom>
-        <Label fx:id="fileNameLabel" prefWidth="300" BorderPane.alignment="CENTER"/>
+        <Label fx:id="fileNameLabel" prefWidth="300"  BorderPane.alignment="CENTER" />
     </bottom>
     <center>
         <VBox BorderPane.alignment="CENTER">
-            <Label text="Целевая функция"/>
-            <GridPane fx:id="objectiveFunction"/>
-            <Label text="Ограничения"/>
-            <GridPane fx:id="table"/>
-            <Label text="Диагональная матрица"/>
-            <GridPane fx:id="diagMatrixPane"/>
-            <Label text="Шаги искусственного базиса"/>
+            <Label text="Целевая функция" />
+            <GridPane fx:id="objectiveFunction" />
+            <Label text="Ограничения" />
+            <GridPane fx:id="table" />
+            <Label text="Диагональная матрица" />
+            <GridPane fx:id="diagMatrixPane" />
+            <Label text="Шаги искусственного базиса" />
             <ScrollPane>
-                <VBox spacing="15.0" prefHeight="200.0" prefWidth="300.0" fx:id="artificialBasisPane"/>
+                <VBox fx:id="artificialBasisPane" prefHeight="200.0" prefWidth="300.0" spacing="15.0" />
             </ScrollPane>
-            <Label text="Шаги симплекс метода"/>
+            <Label text="Шаги симплекс метода" />
             <ScrollPane>
-                <VBox fx:id="simplexSteps" spacing="15.0" prefHeight="340.0" prefWidth="300.0"/>
+                <VBox fx:id="simplexSteps" prefHeight="340.0" prefWidth="300.0" spacing="15.0" />
             </ScrollPane>
             <HBox>
-                <Label text="Ответ: "/>
-                <Label fx:id="answer"/>
+                <Label text="Ответ: " />
+                <Label fx:id="answer" />
             </HBox>
             <BorderPane.margin>
-                <Insets left="10.0"/>
+                <Insets left="10.0" />
             </BorderPane.margin>
         </VBox>
     </center>

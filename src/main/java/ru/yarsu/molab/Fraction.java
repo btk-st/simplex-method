@@ -164,6 +164,7 @@ public class Fraction {
      */
     @Override
     public String toString() {
+        if (numerator == 1 && denominator == -1) return "-1";
         if (Math.abs(denominator) != 1)
             return this.numerator + "/" + this.denominator;
         else return Integer.toString(this.numerator);

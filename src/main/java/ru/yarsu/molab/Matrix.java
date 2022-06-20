@@ -152,4 +152,11 @@ public class Matrix {
         }
         return false;
     }
+    public boolean negativeBi() {
+        int n = matrix.length;
+        for (int i =0; i < n; i++) {
+            if (Fraction.compareToZero(matrix[i][matrix[i].length-1]) == -1) return true;
+        }
+        return false;
+    }
 }

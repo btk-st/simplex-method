@@ -441,6 +441,7 @@ public class LabController {
             stepBack.setDisable(true);
             return false;
         }
+        //todo можно прибавить из другой строки
         //если на главной диагонали есть 0
         if (diagMatrix.getMatrix().zeroOnMainDiagonal()) {
             alert("На главной диагонали есть 0. Выберите другие базисные столбцы/их порядок.");
@@ -450,11 +451,18 @@ public class LabController {
         }
         System.out.println("determinant = " + det);
 
-
+        //todo bi >= 0 !
         //приводим в диагональный вид
         diagMatrix.getMatrix().makeDiagonal();
         System.out.println("diag matrix:");
         createDiagMatrixPane();
+        //если на главной диагонали есть 0
+        if (diagMatrix.getMatrix().negativeBi()) {
+            alert("Получились отрицательные bi. Выберите другие базисные столбцы/их порядок.");
+            startIterationButton.setDisable(true);
+            stepBack.setDisable(true);
+            return false;
+        }
         return true;
     }
 
