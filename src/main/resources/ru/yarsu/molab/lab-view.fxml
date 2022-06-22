@@ -16,6 +16,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ToggleGroup?>
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.yarsu.molab.LabController">
     <top>
         <MenuBar fx:id="menuBar" minWidth="200" BorderPane.alignment="CENTER">
@@ -48,6 +51,14 @@
                 </valueFactory>
             </Spinner>
             <Button fx:id="solve" mnemonicParsing="false" onAction="#startCalc" text="Начать" />
+            <Label text="Решать в:"/>
+            <RadioButton fx:id="checkFraction" selected="true" mnemonicParsing="false" text="обыкновенных дробях" toggleGroup="$parameter">
+                <toggleGroup>
+                    <ToggleGroup fx:id="parameter"/>
+                </toggleGroup>
+            </RadioButton>
+            <RadioButton fx:id="checkDouble" mnemonicParsing="false" text="десятичных дробях" toggleGroup="$parameter">
+            </RadioButton>
             <HBox>
                 <Label text="Решать автоматически?  " />
                 <CheckBox fx:id="autoSolve" selected="false" />

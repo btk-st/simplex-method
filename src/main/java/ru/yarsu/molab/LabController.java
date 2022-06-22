@@ -28,6 +28,8 @@ public class LabController {
     @FXML
     public VBox artificialBasisPane;
     @FXML
+    public ToggleGroup parameter;
+    @FXML
     private Spinner<Integer> varNSpinner;
     @FXML
     private Spinner<Integer> constraintsNSpinner;
@@ -49,6 +51,10 @@ public class LabController {
     Label answer;
     @FXML
     CheckBox autoSolve;
+    @FXML
+    private RadioButton checkFraction;
+    @FXML
+    private RadioButton checkDouble;
 
     private Fraction[] objF;
     private Fraction[][] constraints;

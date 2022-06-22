@@ -72,7 +72,7 @@ public class Fraction {
      * @param denominator
      * @return
      */
-    public int calculateGCD(int numerator, int denominator) {
+    private int calculateGCD(int numerator, int denominator) {
         if (numerator % denominator == 0) {
             return Math.abs(denominator);
         }
@@ -100,6 +100,7 @@ public class Fraction {
      * Reduce the fraction to lowest form
      */
     void reduce() {
+        if (denominator == 1) return;
         int gcd = calculateGCD(numerator, denominator);
         numerator /= gcd;
         denominator /= gcd;
