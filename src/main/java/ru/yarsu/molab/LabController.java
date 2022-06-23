@@ -15,7 +15,6 @@ import javafx.util.Duration;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
 public class LabController {
 
@@ -121,6 +120,14 @@ public class LabController {
         for (int i = cols + 3; i < cols * 2 + 3; i++) {
             String value = ((TextField) (objectiveFunction.getChildren().get(i))).getText();
             objF[i - cols - 3] = new Fraction(value);
+            Fraction toCheck = objF[i - cols - 3];
+            if (checkFraction.isSelected()) {
+                //не даем дроби если решаем в обыкновенных дробях
+                if (toCheck.isDouble()) throw  new IllegalArgumentException();
+            } else {
+                //если решаем в дабле, то не даем знаменатель > 1
+                if (toCheck.isFraction()) throw  new IllegalArgumentException();
+            }
         }
         objF[objF.length - 1] = new Fraction(((TextField) (objectiveFunction.getChildren().get(cols * 2 + 3))).getText());
 
@@ -184,6 +191,14 @@ public class LabController {
             for (int j = 0; j < cols; j++) {
                 String value = ((TextField) (table.getChildren().get((i + 1) * (cols + 2) + j + 1))).getText();
                 constraints[i][j] = new Fraction(value);
+                Fraction toCheck = constraints[i][j];
+                if (checkFraction.isSelected()) {
+                    //не даем дроби если решаем в обыкновенных дробях
+                    if (toCheck.isDouble()) throw  new IllegalArgumentException();
+                } else {
+                    //если решаем в дабле, то не даем знаменатель > 1
+                    if (toCheck.isFraction()) throw  new IllegalArgumentException();
+                }
             }
             constraints[i][solver.getMAX_SIZE()-1] = new Fraction(((TextField) (table.getChildren().get((i + 1) * (cols + 2) + cols + 1))).getText());
         }
@@ -208,7 +223,10 @@ public class LabController {
         //data
         for (int i = 0; i < diagMatrix.getRows(); i++) {
             for (int j = 0; j < diagMatrix.getCols() + 1; j++) {
-                tf = generateCell(((diagMatrix.getMatrix()).getElement(i, j)).toString(), false);
+                Fraction curEl = (diagMatrix.getMatrix()).getElement(i, j);
+                //приводим к даблу, если выбрано решение в дабле
+                if (checkDouble.isSelected()) curEl.toDouble();
+                tf = generateCell(curEl.toString(), false);
                 GridPane.setRowIndex(tf, i + 1);
                 GridPane.setColumnIndex(tf, j);
                 diagMatrixPane.getChildren().add(tf);
@@ -326,6 +344,7 @@ public class LabController {
 
     @FXML
     private void apply() throws IllegalArgumentException {
+        //проверка на вид дробей
         saveObjFTable(varNSpinner.getValue());
         saveConstraintsTable(constraintsNSpinner.getValue(), varNSpinner.getValue());
         System.out.println("saved:");
@@ -616,7 +635,12 @@ public class LabController {
             } else {
                 stepMatrix = steps.get(steps.size() - 1).nextStepMatrix();
             }
+            //todo при дабле не работает вывод ответа
             steps.add(stepMatrix);
+            //пересчитаем в дабле
+            if (checkDouble.isSelected()) {
+                stepMatrix.toDouble();
+            }
             stepMatrix.findPivotElements();
             //нашли ответ
             if (stepMatrix.getPivotElements().size() == 0) {
@@ -692,7 +716,10 @@ public class LabController {
         //data
         for (int i = 0; i < stepMatrix.getRows() + 1; i++) {
             for (int j = 0; j < stepMatrix.getCols() + 1; j++) {
-                tf = generateCell(((stepMatrix.getMatrix()).getElement(i, j)).toString(), false);
+                Fraction curEl = (stepMatrix.getMatrix()).getElement(i, j);
+                //приводим к даблу
+                if (checkDouble.isSelected()) curEl.toDouble();
+                tf = generateCell(curEl.toString(), false);
                 GridPane.setRowIndex(tf, i + 1);
                 GridPane.setColumnIndex(tf, j + 1);
                 stepPane.getChildren().add(tf);

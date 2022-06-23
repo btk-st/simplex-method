@@ -91,7 +91,7 @@ public class StepMatrix {
                 answer += ", " + xs[i].toString();
             }
             answer += ")";
-            answer += "  f = " + matrix.getElement(pRow, cols).multiply(new Fraction(-1, 1));
+            answer += "  f = " + matrix.getElement(pRow, cols).multiply(new Fraction(-1, 1)).toString();
             return;
         }
 
@@ -240,5 +240,13 @@ public class StepMatrix {
 
     public void setoX(int[] oX) {
         this.oX = oX;
+    }
+
+    public void toDouble() {
+        for (int i = 0; i < matrix.getRows(); i++) {
+            for (int j = 0; j < matrix.getCols(); j++) {
+                getMatrix().getElement(i,j).toDouble();
+            }
+        }
     }
 }

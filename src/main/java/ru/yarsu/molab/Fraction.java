@@ -1,10 +1,8 @@
 package ru.yarsu.molab;
 
-import java.text.ParseException;
-
 public class Fraction {
-    int numerator;
-    int denominator;
+    double numerator;
+    double denominator;
 
     /**
      * Constructor
@@ -12,7 +10,7 @@ public class Fraction {
      * @param numr
      * @param denr
      */
-    public Fraction(int numr, int denr) {
+    public Fraction(double numr, double denr) {
         numerator = numr;
         denominator = denr;
         reduce();
@@ -28,16 +26,19 @@ public class Fraction {
         try {
             switch (nums.length) {
                 case 1:
-                    numerator = Integer.parseInt(nums[0]);
+                    numerator = Double.parseDouble(nums[0]);
                     denominator = 1;
                     break;
                 case 2:
-                    numerator = Integer.parseInt(nums[0]);
-                    denominator = Integer.parseInt(nums[1]);
+                    numerator = Double.parseDouble(nums[0]);
+                    denominator = Double.parseDouble(nums[1]);
                     break;
                 default:
                     throw new IllegalArgumentException("bad format");
             }
+            System.out.println(numerator);
+            System.out.println(denominator);
+
         } catch (IllegalArgumentException e) {
             numerator = 0;
             denominator = 1;
@@ -49,19 +50,19 @@ public class Fraction {
 
     }
 
-    public int getNumerator() {
+    public double getNumerator() {
         return numerator;
     }
 
-    public void setNumerator(int numerator) {
+    public void setNumerator(double numerator) {
         this.numerator = numerator;
     }
 
-    public int getDenominator() {
+    public double getDenominator() {
         return denominator;
     }
 
-    public void setDenominator(int denominator) {
+    public void setDenominator(double denominator) {
         this.denominator = denominator;
     }
 
@@ -72,9 +73,9 @@ public class Fraction {
      * @param denominator
      * @return
      */
-    private int calculateGCD(int numerator, int denominator) {
+    private int calculateGCD(double numerator, double denominator) {
         if (numerator % denominator == 0) {
-            return Math.abs(denominator);
+            return (int) Math.abs(denominator);
         }
         return calculateGCD(denominator, numerator % denominator);
     }
@@ -100,7 +101,8 @@ public class Fraction {
      * Reduce the fraction to lowest form
      */
     void reduce() {
-        if (denominator == 1) return;
+        //если дробное - оставляем так
+        if (numerator % 1 != 0 || denominator % 1 != 0) return;
         int gcd = calculateGCD(numerator, denominator);
         numerator /= gcd;
         denominator /= gcd;
@@ -117,9 +119,9 @@ public class Fraction {
      * @return
      */
     public Fraction add(Fraction fractionTwo) {
-        int numer = (numerator * fractionTwo.getDenominator()) +
+        double numer = (numerator * fractionTwo.getDenominator()) +
                 (fractionTwo.getNumerator() * denominator);
-        int denr = denominator * fractionTwo.getDenominator();
+        double denr = denominator * fractionTwo.getDenominator();
         return new Fraction(numer, denr);
     }
 
@@ -130,9 +132,9 @@ public class Fraction {
      * @return
      */
     public Fraction subtract(Fraction fractionTwo) {
-        int newNumerator = (numerator * fractionTwo.denominator) -
+        double newNumerator = (numerator * fractionTwo.denominator) -
                 (fractionTwo.numerator * denominator);
-        int newDenominator = denominator * fractionTwo.denominator;
+        double newDenominator = denominator * fractionTwo.denominator;
         return new Fraction(newNumerator, newDenominator);
     }
 
@@ -143,11 +145,14 @@ public class Fraction {
      * @return
      */
     public Fraction multiply(Fraction fractionTwo) {
-        int newNumerator = numerator * fractionTwo.numerator;
-        int newDenominator = denominator * fractionTwo.denominator;
+        double newNumerator = numerator * fractionTwo.numerator;
+        double newDenominator = denominator * fractionTwo.denominator;
         return new Fraction(newNumerator, newDenominator);
     }
+    public boolean isDouble() {
+        return  (numerator % 1 != 0);
 
+    }
     /**
      * Divides two fractions
      *
@@ -155,8 +160,8 @@ public class Fraction {
      * @return
      */
     public Fraction divide(Fraction fractionTwo) {
-        int newNumerator = numerator * fractionTwo.getDenominator();
-        int newDenominator = denominator * fractionTwo.numerator;
+        double newNumerator = numerator * fractionTwo.getDenominator();
+        double newDenominator = denominator * fractionTwo.numerator;
         return new Fraction(newNumerator, newDenominator);
     }
 
@@ -167,7 +172,21 @@ public class Fraction {
     public String toString() {
         if (numerator == 1 && denominator == -1) return "-1";
         if (Math.abs(denominator) != 1)
-            return this.numerator + "/" + this.denominator;
-        else return Integer.toString(this.numerator);
+            return (int)numerator + "/" + (int)denominator;
+        else if (numerator % 1 == 0) {
+            //если в числителе - целое число
+            return Integer.toString((int)numerator);
+        } else {
+            //если не целое
+            return Double.toString(numerator);
+        }
+    }
+    public void toDouble() {
+        numerator = Math.ceil((numerator / denominator) * 1000) / 1000;
+        denominator = 1;
+    }
+
+    public boolean isFraction() {
+        return denominator != 1;
     }
 }
