@@ -49,7 +49,6 @@ public class Solver {
             Fraction bi = constraints[i][MAX_SIZE-1];
             //умножаем на 1 или -1
             Fraction multiplier = new Fraction(((Fraction.compareToZero(bi) == -1) ? -1 : 1), 1);
-            System.out.println(multiplier);
             artificialSolver.getConstraints()[i][MAX_SIZE-1] = new Fraction(bi.multiply(multiplier));
             for (int j = 0; j < n; j ++) {
                 artificialSolver.getConstraints()[i][j] = new Fraction(constraints[i][j].multiply(multiplier));

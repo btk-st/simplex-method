@@ -36,8 +36,6 @@ public class Fraction {
                 default:
                     throw new IllegalArgumentException("bad format");
             }
-            System.out.println(numerator);
-            System.out.println(denominator);
 
         } catch (IllegalArgumentException e) {
             numerator = 0;

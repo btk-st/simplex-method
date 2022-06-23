@@ -426,6 +426,7 @@ public class LabController {
     }
 
     private boolean defaultCalc() {
+        System.out.println("basis:");
         System.out.println(basis);
         //пользователь выбрал базисные переменные самостоятельно
         if (basis.size() != solver.getConstraintsN()) {
@@ -751,7 +752,6 @@ public class LabController {
 
                 TextField textField = (TextField) e.getSource();
                 stepMatrix.setSelectedPivot(el);
-                System.out.println(stepMatrix.getSelectedPivot().getI() + " " + stepMatrix.getSelectedPivot().getJ());
                 textField.setStyle(textField.getStyle() + "-fx-control-inner-background:#2494c4;");
             });
         }
