@@ -30,8 +30,6 @@
             </Menu>
             <Menu text="О программе">
                 <MenuItem onAction="#handleAuthor" text="Автор" />
-                <SeparatorMenuItem />
-                <MenuItem onAction="#handleHelp" text="Помощь" />
             </Menu>
         </MenuBar>
     </top>
